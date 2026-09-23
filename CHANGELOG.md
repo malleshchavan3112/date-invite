@@ -1,0 +1,110 @@
+# Changelog
+
+All notable changes to the DateInvite project are documented in this file.
+
+## [Phase 4.0] — 2026-09-23
+
+### Added
+- **P13 Submitting Screen (`src/components/invitation/SubmittingScreen.tsx`)**:
+  - Animated soaring envelope motif with dual pulsing soft glow rings and indeterminate shimmer progress bar.
+  - Heading: "Sending your answer…", supporting copy: "Just a moment — your response is on its way."
+  - Duplicate submission lock disabling controls and preventing accidental double-clicks.
+  - Accessible focus management and `aria-live="polite"` status announcement.
+- **P14 Success Screen (`src/components/invitation/SuccessScreen.tsx`)**:
+  - Celebration state with "It's a date! 🎉", checkmark badge, and ambient floating sparkles.
+  - Confirmation text: "Your answer has been sent.", "Your response has been recorded.", "They'll get your response and can take it from here."
+  - Summary recap card presenting recipient's selected Date Type, Preferred Day, Time, Vibe, and Note.
+  - Privacy firewall: strictly excludes creator email and internal backend metadata.
+  - Clear "Done" CTA navigating home.
+- **P15 Invalid Invitation Screen (`src/components/invitation/InvalidInvitationScreen.tsx`)**:
+  - Branded friendly error state for non-existent, expired, or inactive invitation slugs.
+  - Heading: "This invitation isn't available", copy: "It looks like this invitation is no longer active or the link may be incorrect."
+  - Warm empty-state envelope illustration and "Back to Home" primary CTA.
+  - Strict privacy protection: never discloses whether an invitation ever existed.
+- **P16 Submission Error Screen (`src/components/invitation/SubmissionErrorScreen.tsx`)**:
+  - Dedicated retry state preserving all user responses in memory without reset.
+  - Heading: "Something went wrong", copy: "We couldn't send your response just yet. Your answers are still here."
+  - Reassuring badge: "All your answers are safely saved".
+  - Primary "Try Again" action (retries P13 submission) and secondary "Review Answers" action (returns directly to P12).
+  - Graceful handling of `ALREADY_SUBMITTED` structured error code.
+- **Isolated Mock Response Repository (`src/lib/response-repository.ts`)**:
+  - In-memory singleton `__dateInviteResponseStore` synchronized with `localStorage`.
+  - Implemented `submitResponse`, `getResponseByInvitationId`, and `hasResponseForInvitation`.
+  - Enforced single completed YES response per invitation (`ALREADY_SUBMITTED`).
+  - Validation enforcing required fields and strictly verifying `answer === 'yes'`.
+  - Added dev-only deterministic error testing via `?mockSubmissionError=true` query parameter.
+- **Server Action Integration (`src/lib/actions.ts`)**:
+  - Added `submitResponseAction` delegating securely to the isolated mock repository.
+- **Flow State Machine & Routing Updates**:
+  - Updated `InvitationFlow.tsx` with `submitting`, `success`, `invalid`, `error` states and transitions.
+  - Updated `ReviewAnswersStep.tsx` with "Send My Answer — It's a Date! 💌" CTA triggering submission.
+  - Updated `/invite/[slug]/page.tsx` and created `src/app/not-found.tsx` to route invalid slugs to P15.
+  - Guaranteed 100% preservation of the respectful NO path (P03 → P04 → P05).
+
+---
+
+## [Phase 3.0] — 2026-09-23
+
+### Added
+- **P06 Recipient Name**: Dedicated input screen with validation, auto-focus, Enter key support, and subtle progress indicator (`STEP 1 OF 6`).
+- **P07 Date Type**: 6 choice cards (Coffee, Dinner, Picnic, Movie, Adventure, Surprise) with responsive 2-column grid and single-select enforcement (`STEP 2 OF 6`).
+- **P08 Preferred Day**: Interactive schedule choice cards (Weekday, Friday, Saturday, Sunday, Any day) with single-select (`STEP 3 OF 6`).
+- **P09 Preferred Time**: Time-of-day choice cards (Morning, Afternoon, Evening, Night) with single-select (`STEP 4 OF 6`).
+- **P10 Date Vibe**: Aesthetic mood choice cards (Cozy, Romantic, Fun, Fancy, Chill, Spontaneous) with expressive styling (`STEP 5 OF 6`).
+- **P11 Optional Message**: Multiline textarea note with live character counter (`0 / 300`), 300-char max, "Review Invitation" CTA, and "Skip" button (`STEP 6 OF 6`).
+- **P12 Review Answers**: Consolidated summary card displaying all answers with individual "Edit" actions, back navigation, and state lock preparing for Phase 4.
+- **QuestionnaireProgress Component**: Accessible progress bar and dot counter with contextual Back button.
+- **InvitationFlow State Management**: Client state machine in `src/components/invitation/InvitationFlow.tsx` preserving all questionnaire answers across forward, backward, and edit transitions without network requests.
+- **Directional Slide Transitions**: Bidirectional horizontal slide animations respecting `prefers-reduced-motion`.
+
+---
+
+## [Phase 2.5] — 2026-09-23
+
+### Added
+- **Two-Sided Invitation Model**: Refactored architecture to support distinct Creator and Recipient actors.
+- **C01 Create Invitation Screen (`/` and `/create`)**:
+  - Implemented creator onboarding with Name and Email inputs.
+  - Added inline form validation (required checks, email regex pattern validation).
+  - Added "Create My Invitation" CTA with loading indicator and disabled state.
+  - Integrated `createInvitationAction` Server Action for secure registration.
+- **C02 Invitation Created / Share Hub (`/create/success`)**:
+  - Implemented shareable link card with dynamic URL generation.
+  - Added "Copy Link" button with animated checkmark and `aria-live` accessible announcement.
+  - Integrated native `navigator.share` API with graceful clipboard fallback.
+  - Added direct WhatsApp share button with pre-filled teaser message.
+  - Added invitation preview link and "Create Another Invitation" action.
+- **Isolated Invitation Repository (`src/lib/invitation-repository.ts`)**:
+  - Implemented `generateUnpredictableSlug` using cryptographically secure random values.
+  - Implemented singleton in-memory storage with browser localStorage synchronization.
+  - Added `toPublicInvitation` and `getPublicInvitationBySlug` strictly stripping `creator_email`.
+- **Privacy Firewall Enforcement**:
+  - Prohibited passing `creator_email` in URL parameters or slugs.
+  - Ensured recipient endpoints (`/invite/[slug]`) receive only non-sensitive public metadata.
+- **Responsive & Design System Polish**:
+  - Validated 375px mobile, 390px, 768px tablet, and 1280px+ desktop viewports.
+  - Maintained complete visual compatibility with existing P01–P05 recipient flow.
+
+---
+
+## [Phase 2.0] — 2026-09-23
+
+### Added
+- **Public Recipient Flow Screens (P01–P05)**:
+  - P01: LoadingScreen with rocking envelope animation and progress shimmer.
+  - P02: LandingScreen with envelope reveal and personalized greeting copy.
+  - P03: DateQuestion screen with main date proposal and YES celebration particle burst.
+  - P04: PlayfulNo screen with spring physics dodging button and 3-attempt bottom sheet modal.
+  - P05: NoCompletion screen with respectful, warm closing state.
+- **Framer Motion Integration**: Page transitions via `AnimatePresence` and `prefers-reduced-motion` compliance.
+
+---
+
+## [Phase 1.0] — 2026-09-23
+
+### Added
+- **Project Foundation**:
+  - Next.js 14 App Router, TypeScript strict mode, Tailwind CSS v3.
+  - Design tokens for romance palette (`terracotta`, `rose`, `sage`, `sand`).
+  - Google Fonts integration (`DM Serif Display` and `Inter`).
+  - Core UI component primitives (`PrimaryButton`, `SecondaryButton`, `ChoiceCard`, `ProgressBar`, `PageTransition`).
