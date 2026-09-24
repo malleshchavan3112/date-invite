@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FadeIn } from '@/components/ui/PageTransition';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 /**
  * P15 — Invalid Invitation Screen
@@ -24,23 +25,26 @@ export default function InvalidInvitationScreen() {
 
   return (
     <div
-      className="screen"
+      className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8"
       role="region"
       aria-label="Invitation Not Available"
       id="invalid-invitation-screen"
     >
-      <div className="w-full max-w-md mx-auto">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
         <FadeIn delay={0.05}>
-          <div className="content-card text-center bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border">
+          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-7 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 text-center">
             {/* Friendly Empty-State Envelope Illustration */}
-            <div className="relative flex justify-center mb-6">
+            <div className="relative inline-flex items-center justify-center mb-5">
               <div
-                className="w-20 h-20 rounded-full bg-soft-pink flex items-center justify-center relative shadow-sm"
+                className="w-20 h-20 rounded-full bg-primary-subtle border border-primary/20 flex items-center justify-center relative shadow-sm"
                 aria-hidden="true"
               >
                 {!prefersReducedMotion && (
                   <motion.div
-                    className="absolute inset-0 rounded-full border border-primary/20"
+                    className="absolute inset-0 rounded-full border border-primary/25"
                     animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.1, 0.5] }}
                     transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
                   />
@@ -67,7 +71,7 @@ export default function InvalidInvitationScreen() {
               <h1
                 ref={headingRef}
                 tabIndex={-1}
-                className="font-serif text-display-md text-dark mb-3 leading-tight outline-none"
+                className="font-serif text-2xl sm:text-3xl text-dark mb-2.5 leading-snug outline-none font-normal"
               >
                 This invitation isn&apos;t available
               </h1>
@@ -75,16 +79,16 @@ export default function InvalidInvitationScreen() {
 
             {/* Supporting Copy */}
             <FadeIn delay={0.25}>
-              <p className="font-sans text-body-md text-muted mb-8 leading-relaxed max-w-xs mx-auto text-balance">
+              <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 leading-relaxed max-w-xs mx-auto text-balance">
                 It looks like this invitation is no longer active or the link may be incorrect.
               </p>
             </FadeIn>
 
             {/* Subtle decorative divider */}
             <div className="flex items-center justify-center gap-3 mb-6" aria-hidden="true">
-              <div className="h-px flex-1 bg-border/60" />
+              <div className="h-px flex-1 bg-border/70" />
               <span className="text-muted/40 text-xs">✦</span>
-              <div className="h-px flex-1 bg-border/60" />
+              <div className="h-px flex-1 bg-border/70" />
             </div>
 
             {/* Call to Action */}
@@ -92,13 +96,13 @@ export default function InvalidInvitationScreen() {
               <div className="flex flex-col gap-3">
                 <Link
                   href="/"
-                  className="btn-primary w-full text-center"
+                  className="btn-primary w-full text-center py-3.5"
                   id="invalid-back-home-btn"
                 >
                   Back to Home
                 </Link>
 
-                <p className="text-xs text-muted/60 tracking-wider uppercase font-sans mt-2">
+                <p className="text-[11px] text-muted/60 tracking-wider uppercase font-sans mt-2">
                   DateInvite
                 </p>
               </div>

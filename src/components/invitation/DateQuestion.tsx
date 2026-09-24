@@ -1,37 +1,47 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
-import { FadeIn } from '@/components/ui/PageTransition';
+import NoEscapeButton from '@/components/ui/NoEscapeButton';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import type { Invitation, PublicInvitation } from '@/types';
 
 interface DateQuestionProps {
+  invitation?: Invitation | PublicInvitation | null;
   onYes: () => void;
   onNo: () => void;
 }
 
 const CELEBRATION_PARTICLES = [
-  '❤️', '💕', '💗', '💖', '✨', '🌹', '💝', '🎉', '💫', '🥰',
+  '❤️', '✨', '💕', '🌹', '💖', '🥰', '💫', '🎉',
 ];
 
 /**
- * P03 — Main Date Question
- * "Would you go on a date with me?"
- * YES: celebration burst → onYes()
- * NO: → onNo() (P04 PlayfulNo)
+ * P03 — Main Date Question (Hero Screen)
+ *
+ * Features:
+ * - Ambient decorative background with floating petals & glow orbs
+ * - Refined romantic avatar container with gentle floating motion
+ * - High-contrast typography with DM Serif Display headline
+ * - YES primary CTA with subtle ambient pulse and celebration burst
+ * - NO evasive button with desktop pointer proximity dodge + mobile touch model
+ * - 100% accessible via keyboard and screen readers
  */
-export default function DateQuestion({ onYes, onNo }: DateQuestionProps) {
+export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionProps) {
   const [celebrating, setCelebrating] = useState(false);
   const hasActed = useRef(false);
   const prefersReducedMotion = useReducedMotion();
 
+  const creatorName = invitation?.creator_name || 'Someone special';
+  const supportingText = invitation?.intro_text || `${creatorName} asked with hope in their heart ✨`;
+
   const handleYes = useCallback(() => {
-    if (hasActed.current) return; // prevent double-click
+    if (hasActed.current) return;
     hasActed.current = true;
     setCelebrating(true);
-    // After celebration, advance
-    setTimeout(onYes, prefersReducedMotion ? 100 : 1100);
+    setTimeout(onYes, prefersReducedMotion ? 120 : 1000);
   }, [onYes, prefersReducedMotion]);
 
   const handleNo = useCallback(() => {
@@ -41,76 +51,165 @@ export default function DateQuestion({ onYes, onNo }: DateQuestionProps) {
   }, [onNo]);
 
   return (
-    <div className="screen relative overflow-hidden">
-      {/* Celebration burst — rendered over full screen */}
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
+      {/* ── Celebration Burst Micro-Animation on YES ── */}
       <AnimatePresence>
         {celebrating && (
           <CelebrationBurst key="celebration" prefersReducedMotion={!!prefersReducedMotion} />
         )}
       </AnimatePresence>
 
+      {/* ── Hero Invitation Card ── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-        className="content-card text-center max-w-sm mx-auto relative z-10"
+        initial={{ opacity: 0, y: 22, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.42, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full max-w-sm sm:max-w-md mx-auto bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 relative z-10 text-center"
       >
-        {/* Eyebrow */}
-        <FadeIn delay={0.05}>
-          <p className="text-label uppercase tracking-widest text-muted mb-5">
-            Here&apos;s the question…
-          </p>
-        </FadeIn>
+        {/* Eyebrow Pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, duration: 0.3 }}
+          className="mb-4 inline-flex items-center gap-1.5 bg-primary-subtle text-primary border border-primary/20 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
+          <span>Special Invitation</span>
+        </motion.div>
 
-        {/* Main question */}
-        <FadeIn delay={0.15}>
-          <h1 className="font-serif text-display-md text-dark mb-10 text-balance leading-tight">
-            Would you go on a date with me?
+        {/* ── Refined Avatar / Image Presentation ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.88 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.14, duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
+          className="relative mx-auto mb-5 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center"
+        >
+          {/* Ambient soft glow ring behind avatar */}
+          <div
+            className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-tr from-rose-200/50 to-pink-100/40 blur-md -z-10"
+            aria-hidden="true"
+          />
+
+          {/* Avatar Container */}
+          <motion.div
+            animate={
+              prefersReducedMotion
+                ? {}
+                : {
+                    y: [0, -5, 0],
+                    rotate: [0, 1, 0, -1, 0],
+                  }
+            }
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="w-full h-full relative rounded-[1.75rem] overflow-hidden border-2 border-white shadow-md bg-sand-50"
+          >
+            <Image
+              src="/images/romantic-avatar.jpg"
+              alt="Romantic invitation illustration"
+              fill
+              sizes="(max-width: 640px) 112px, 128px"
+              priority
+              className="object-cover object-center select-none"
+            />
+          </motion.div>
+
+          {/* Little heart badge accent */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 450, damping: 18 }}
+            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-button border-2 border-white"
+            aria-hidden="true"
+          >
+            ❤️
+          </motion.div>
+        </motion.div>
+
+        {/* ── Main Question Headline ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.32 }}
+        >
+          <h1 className="font-serif text-2xl sm:text-3xl lg:text-[2rem] text-dark leading-snug mb-2 text-balance font-normal">
+            Will you go on a date with me?
           </h1>
-        </FadeIn>
+        </motion.div>
 
-        {/* YES button with ambient pulse ring */}
-        <FadeIn delay={0.3}>
-          <div className="relative flex justify-center mb-5">
-            {/* Ambient glow — hidden when celebrating */}
-            {!celebrating && (
+        {/* Supporting Line */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28, duration: 0.3 }}
+        >
+          <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 text-balance max-w-xs mx-auto leading-relaxed">
+            {supportingText}
+          </p>
+        </motion.div>
+
+        {/* ── Interactive Action Arena (YES + Evasive NO) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.34, duration: 0.3 }}
+          className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1"
+        >
+          {/* YES Primary CTA with subtle pulse glow */}
+          <div className="relative w-full sm:w-auto">
+            {!celebrating && !prefersReducedMotion && (
               <motion.div
                 aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-primary/15"
-                animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute inset-0 rounded-full bg-primary/20 pointer-events-none"
+                animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0, 0.6] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
               />
             )}
+
             <PrimaryButton
               onClick={handleYes}
               disabled={celebrating}
               id="yes-btn"
-              aria-label="Yes, I would go on a date"
-              className="relative z-10 text-xl px-12 py-5 !text-xl"
+              aria-label="Yes, I would love to go on a date"
+              className="w-full sm:w-auto px-9 py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover font-semibold"
             >
-              YES ❤️
+              <span>YES</span>
+              <span className="text-sm" aria-hidden="true">❤️</span>
             </PrimaryButton>
           </div>
-        </FadeIn>
 
-        {/* NO — clearly secondary, smaller, below YES */}
-        <FadeIn delay={0.5}>
-          <SecondaryButton
-            onClick={handleNo}
-            disabled={celebrating}
-            id="no-btn"
-            aria-label="No, I would not go on a date"
-            className="text-sm opacity-70 hover:opacity-100"
-          >
-            NO 😏
-          </SecondaryButton>
-        </FadeIn>
+          {/* Evasive NO Button (Desktop proximity dodge + mobile friendly nudge) */}
+          <div className="w-full sm:w-auto flex justify-center">
+            <NoEscapeButton
+              onSelectNo={handleNo}
+              id="no-btn"
+              disabled={celebrating}
+              className="w-full sm:w-auto"
+            />
+          </div>
+        </motion.div>
+
+        {/* Reassuring micro-footer */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+          className="text-[11px] text-muted/60 tracking-wide uppercase font-sans mt-6"
+        >
+          Answer honestly • Made with care
+        </motion.p>
       </motion.div>
     </div>
   );
 }
 
-// ─── Celebration Burst ────────────────────────────────────────────────────
+// ─── Celebration Burst ───────────────────────────────────────────────────────
 
 interface CelebrationBurstProps {
   prefersReducedMotion: boolean;
@@ -118,14 +217,13 @@ interface CelebrationBurstProps {
 
 function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
   if (prefersReducedMotion) {
-    // Reduced motion: just a simple flash overlay
     return (
       <motion.div
         aria-hidden="true"
-        className="absolute inset-0 bg-primary/10 pointer-events-none z-20"
+        className="fixed inset-0 bg-primary/10 pointer-events-none z-30"
         initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{ duration: 0.6, times: [0, 0.3, 1] }}
+        animate={{ opacity: [0, 0.8, 0] }}
+        transition={{ duration: 0.6 }}
       />
     );
   }
@@ -133,17 +231,16 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
+      className="fixed inset-0 pointer-events-none z-30 overflow-hidden"
     >
-      {Array.from({ length: 14 }).map((_, i) => {
+      {Array.from({ length: 18 }).map((_, i) => {
         const emoji = CELEBRATION_PARTICLES[i % CELEBRATION_PARTICLES.length];
-        const angle = (i / 14) * 360;
-        const dist = 90 + Math.random() * 140;
+        const angle = (i / 18) * 360;
+        const dist = 110 + Math.random() * 160;
         const tx = Math.cos((angle * Math.PI) / 180) * dist;
-        // bias upward: subtract extra y so hearts fly up
         const ty = Math.sin((angle * Math.PI) / 180) * dist - 80;
-        const sz = 18 + Math.random() * 18;
-        const delay = Math.random() * 0.15;
+        const sz = 18 + Math.random() * 16;
+        const delay = Math.random() * 0.12;
 
         return (
           <motion.span
@@ -153,7 +250,6 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
               left: '50%',
               top: '50%',
               fontSize: sz,
-              // start centered
               marginLeft: -sz / 2,
               marginTop: -sz / 2,
             }}
@@ -161,13 +257,13 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
             animate={{
               x: tx,
               y: ty,
-              scale: [0, 1.3, 1, 0],
-              opacity: [1, 1, 0.7, 0],
+              scale: [0, 1.35, 1, 0],
+              opacity: [1, 1, 0.8, 0],
             }}
             transition={{
-              duration: 1.0,
+              duration: 1.05,
               delay,
-              ease: [0.2, 0, 0.6, 1],
+              ease: [0.2, 0, 0.4, 1],
             }}
           >
             {emoji}

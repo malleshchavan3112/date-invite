@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 /**
  * P13 — Submitting
@@ -13,28 +14,30 @@ export default function SubmittingScreen() {
   const prefersReducedMotion = useReducedMotion();
   const headingRef = useRef<HTMLHeadingElement>(null);
 
-  // Manage focus for screen readers and keyboard users
   useEffect(() => {
     headingRef.current?.focus();
   }, []);
 
   return (
     <div
-      className="screen"
+      className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8"
       role="status"
       aria-live="polite"
       aria-busy="true"
       id="submitting-screen"
     >
-      <div className="relative flex flex-col items-center gap-8 max-w-sm mx-auto text-center px-4">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
+      <div className="relative flex flex-col items-center gap-7 max-w-sm mx-auto text-center px-4 z-10">
         {/* Glow rings and animated envelope */}
         <div className="relative flex items-center justify-center">
           {/* Outer glow ring */}
           {!prefersReducedMotion && (
             <motion.div
               aria-hidden="true"
-              className="absolute w-36 h-36 rounded-full bg-primary/10"
-              animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0.1, 0.4] }}
+              className="absolute w-40 h-40 rounded-full bg-primary/10 blur-md"
+              animate={{ scale: [1, 1.35, 1], opacity: [0.4, 0.1, 0.4] }}
               transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
             />
           )}
@@ -43,28 +46,28 @@ export default function SubmittingScreen() {
           {!prefersReducedMotion && (
             <motion.div
               aria-hidden="true"
-              className="absolute w-24 h-24 rounded-full bg-primary/15"
-              animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.2, 0.6] }}
+              className="absolute w-28 h-28 rounded-full bg-primary/15"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.15, 0.6] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
             />
           )}
 
-          {/* Animated envelope — soaring/gliding motion */}
+          {/* Animated envelope — soaring motion */}
           <motion.div
             animate={
               prefersReducedMotion
                 ? {}
                 : {
-                    y: [0, -12, 0],
+                    y: [0, -10, 0],
                     rotate: [-2, 3, -2],
                   }
             }
             transition={{
-              duration: 2.4,
+              duration: 2.5,
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="relative z-10 select-none text-6xl leading-none filter drop-shadow-md"
+            className="relative z-10 select-none text-6xl sm:text-7xl leading-none drop-shadow-md"
             role="img"
             aria-label="Flying sealed envelope"
           >
@@ -77,49 +80,47 @@ export default function SubmittingScreen() {
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="font-serif text-display-md text-dark leading-tight outline-none"
+            className="font-serif text-2xl sm:text-3xl text-dark leading-snug outline-none font-normal"
           >
             Sending your answer…
           </h1>
-          <p className="font-sans text-body-md text-muted max-w-xs leading-relaxed">
+          <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-xs leading-relaxed">
             Just a moment — your response is on its way.
           </p>
         </div>
 
         {/* Animated Loading Dots */}
-        <div className="flex items-center gap-2" aria-hidden="true">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 rounded-full bg-primary"
-              animate={
-                prefersReducedMotion
-                  ? {}
-                  : {
-                      opacity: [0.3, 1, 0.3],
-                      scale: [0.8, 1.15, 0.8],
-                    }
-              }
-              transition={{
-                duration: 1.2,
-                repeat: Infinity,
-                delay: i * 0.2,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
+        {!prefersReducedMotion && (
+          <div className="flex items-center gap-2" aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 rounded-full bg-primary"
+                animate={{
+                  opacity: [0.25, 1, 0.25],
+                  scale: [0.8, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 1.1,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Indeterminate Shimmer Progress Bar */}
         <div
-          className="w-48 h-1.5 bg-soft-pink rounded-full overflow-hidden relative"
+          className="w-48 h-1.5 bg-primary-subtle border border-primary/20 rounded-full overflow-hidden relative"
           role="progressbar"
           aria-label="Sending response progress"
           aria-valuemin={0}
           aria-valuemax={100}
         >
           <motion.div
-            className="absolute top-0 bottom-0 bg-primary rounded-full"
+            className="absolute top-0 bottom-0 bg-gradient-to-r from-primary to-[#FF3B6F] rounded-full"
             style={{ width: '45%' }}
             animate={
               prefersReducedMotion
@@ -137,7 +138,7 @@ export default function SubmittingScreen() {
         </div>
 
         {/* Reassurance text */}
-        <p className="text-xs text-muted/70 tracking-wide font-sans mt-2">
+        <p className="text-xs text-muted/60 tracking-wide font-sans mt-1">
           Please keep this tab open
         </p>
       </div>

@@ -5,6 +5,7 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import ChoiceCard from '@/components/ui/ChoiceCard';
 import QuestionnaireProgress from './QuestionnaireProgress';
 import { FadeIn } from '@/components/ui/PageTransition';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 interface PreferredTimeStepProps {
   value: string;
@@ -39,10 +40,13 @@ export default function PreferredTimeStep({
   };
 
   return (
-    <div className="screen flex flex-col justify-center items-center px-4 py-8">
-      <div className="w-full max-w-md mx-auto">
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
         <FadeIn delay={0.05}>
-          <div className="content-card bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border">
+          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300">
             {/* Header progress & back */}
             <QuestionnaireProgress
               currentStep={4}
@@ -53,10 +57,10 @@ export default function PreferredTimeStep({
 
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
-              <h1 className="font-serif text-display-md text-dark mb-2.5 leading-tight text-balance">
+              <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
                 What time feels right?
               </h1>
-              <p className="font-sans text-body-md text-muted leading-relaxed text-balance">
+              <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
                 Pick the hour that fits your flow.
               </p>
             </div>
@@ -87,6 +91,7 @@ export default function PreferredTimeStep({
               disabled={!selected}
               fullWidth
               id="preferred-time-continue-btn"
+              className="py-3.5 text-base sm:text-lg"
             >
               {isEditingFromReview ? 'Save & Return to Review' : 'Continue'}
             </PrimaryButton>

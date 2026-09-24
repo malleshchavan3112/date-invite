@@ -5,6 +5,7 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import QuestionnaireProgress from './QuestionnaireProgress';
 import { FadeIn } from '@/components/ui/PageTransition';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 interface OptionalMessageStepProps {
   value: string;
@@ -37,10 +38,13 @@ export default function OptionalMessageStep({
   };
 
   return (
-    <div className="screen flex flex-col justify-center items-center px-4 py-8">
-      <div className="w-full max-w-md mx-auto">
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
         <FadeIn delay={0.05}>
-          <div className="content-card bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border">
+          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300">
             {/* Header progress & back */}
             <QuestionnaireProgress
               currentStep={6}
@@ -51,10 +55,10 @@ export default function OptionalMessageStep({
 
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
-              <h1 className="font-serif text-display-md text-dark mb-2.5 leading-tight text-balance">
+              <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
                 Anything you&apos;d like them to know?
               </h1>
-              <p className="font-sans text-body-md text-muted leading-relaxed text-balance">
+              <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
                 Totally optional. Dietary preferences, little ideas, or anything else.
               </p>
             </div>
@@ -64,7 +68,7 @@ export default function OptionalMessageStep({
               <div>
                 <label
                   htmlFor="optional-message-textarea"
-                  className="block text-label uppercase tracking-wider text-muted font-sans font-semibold mb-2"
+                  className="block text-xs uppercase tracking-wider text-muted font-sans font-semibold mb-2"
                 >
                   Your note (optional)
                 </label>
@@ -76,7 +80,7 @@ export default function OptionalMessageStep({
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Write a little note…"
-                    className="w-full px-4 py-3.5 rounded-2xl border border-border text-dark bg-sand-50/60 placeholder:text-muted/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base resize-none"
+                    className="w-full px-4 py-3.5 rounded-2xl border border-border text-dark bg-sand-50/70 placeholder:text-muted/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base resize-none"
                   />
                   {/* Character Counter */}
                   <div className="flex justify-end mt-1.5">
@@ -97,6 +101,7 @@ export default function OptionalMessageStep({
                   type="submit"
                   fullWidth
                   id="message-continue-btn"
+                  className="py-3.5 text-base sm:text-lg"
                 >
                   {isEditingFromReview ? 'Save & Return to Review' : 'Review Invitation'}
                 </PrimaryButton>
@@ -107,6 +112,7 @@ export default function OptionalMessageStep({
                     onClick={onSkip}
                     fullWidth
                     id="message-skip-btn"
+                    className="py-3"
                   >
                     Skip
                   </SecondaryButton>

@@ -11,8 +11,8 @@ interface QuestionnaireProgressProps {
 }
 
 /**
- * QuestionnaireProgress — subtle, animated progress header for P06–P11.
- * Features a clean back button, step indicator, and progress dots.
+ * QuestionnaireProgress — Subtle, animated progress header for P06–P11.
+ * Features a high-contrast back button, step indicator, and progress pills.
  */
 export default function QuestionnaireProgress({
   currentStep,
@@ -27,15 +27,15 @@ export default function QuestionnaireProgress({
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-dark focus-visible:text-dark transition-colors py-1.5 px-2.5 -ml-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        aria-label={isEditingFromReview ? 'Cancel and return to review' : `Go back to previous question`}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-dark focus-visible:text-dark transition-colors py-2 px-3 -ml-3 rounded-full hover:bg-sand-100/80 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        aria-label={isEditingFromReview ? 'Cancel and return to review' : 'Go back to previous question'}
       >
         <svg
           className="w-4 h-4 flex-shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2.4"
           aria-hidden="true"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -49,7 +49,7 @@ export default function QuestionnaireProgress({
         role="region"
         aria-label={`Questionnaire progress: step ${currentStep} of ${totalSteps}`}
       >
-        <span className="text-label text-muted/70 text-xs tracking-wider uppercase font-semibold">
+        <span className="text-xs uppercase tracking-wider font-semibold text-muted font-sans">
           {currentStep} of {totalSteps}
         </span>
         <div className="flex items-center gap-1" aria-hidden="true">
@@ -61,7 +61,7 @@ export default function QuestionnaireProgress({
               <motion.span
                 key={i}
                 animate={{
-                  width: isCurrent ? 14 : 5,
+                  width: isCurrent ? 16 : 6,
                   backgroundColor: isCurrent ? '#FF4F7B' : isCompleted ? '#FF7A9B' : '#F0D6DF',
                 }}
                 transition={{ duration: 0.25, ease: 'easeOut' }}

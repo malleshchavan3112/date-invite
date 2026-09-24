@@ -192,6 +192,7 @@ export default function InvitationFlow({ invitation }: InvitationFlowProps) {
       case 'question':
         return (
           <DateQuestion
+            invitation={invitation}
             onYes={() => goTo('name', 'forward')}
             onNo={() => goTo('playful-no', 'forward')}
           />

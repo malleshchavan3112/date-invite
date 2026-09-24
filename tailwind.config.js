@@ -13,12 +13,21 @@ module.exports = {
           DEFAULT: '#FF4F7B',
           hover: '#E8436B',
           light: '#FF7A9B',
+          subtle: '#FFF0F3',
         },
         dark: '#1F1F1F',
         'soft-pink': '#FFE4EC',
-        muted: '#777777',
+        muted: {
+          DEFAULT: '#6B7280',
+          foreground: '#4B5563',
+        },
         surface: '#FFFFFF',
         border: '#F0D6DF',
+        sand: {
+          50: '#FAF6F3',
+          100: '#F5EFEB',
+          200: '#EBE3DD',
+        },
       },
       fontFamily: {
         serif: ['"DM Serif Display"', '"Playfair Display"', 'Georgia', 'serif'],
@@ -27,15 +36,15 @@ module.exports = {
       fontSize: {
         'display-xl': ['clamp(2.5rem, 8vw, 4.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
         'display-lg': ['clamp(2rem, 6vw, 3.5rem)', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
-        'display-md': ['clamp(1.5rem, 4vw, 2.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'display-md': ['clamp(1.5rem, 4.5vw, 2.25rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
         'body-lg': ['1.125rem', { lineHeight: '1.6' }],
         'body-md': ['1rem', { lineHeight: '1.6' }],
         'body-sm': ['0.875rem', { lineHeight: '1.5' }],
         'label': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.08em' }],
       },
       spacing: {
-        'safe-top': 'env(safe-area-inset-top)',
-        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-top': 'env(safe-area-inset-top, 1rem)',
+        'safe-bottom': 'env(safe-area-inset-bottom, 1rem)',
       },
       borderRadius: {
         '2xl': '1rem',
@@ -43,10 +52,11 @@ module.exports = {
         '4xl': '2rem',
       },
       boxShadow: {
-        'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(255,79,123,0.08)',
-        'card-hover': '0 4px 12px rgba(0,0,0,0.06), 0 12px 32px rgba(255,79,123,0.14)',
+        'card': '0 4px 20px -2px rgba(255,79,123,0.07), 0 2px 6px -1px rgba(0,0,0,0.03)',
+        'card-hover': '0 12px 32px -4px rgba(255,79,123,0.14), 0 4px 12px -2px rgba(0,0,0,0.06)',
         'button': '0 4px 14px rgba(255,79,123,0.35)',
-        'button-hover': '0 6px 20px rgba(255,79,123,0.45)',
+        'button-hover': '0 6px 22px rgba(255,79,123,0.45)',
+        'glow': '0 0 28px rgba(255,79,123,0.22)',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

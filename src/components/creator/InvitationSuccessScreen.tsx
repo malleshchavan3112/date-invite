@@ -3,23 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
-
-// Decorative celebration floaters
-const CELEBRATION_ACCENTS = [
-  { emoji: '✨', x: '10%', y: '12%', delay: 0.1, size: 'text-xl', dur: 4.5 },
-  { emoji: '💌', x: '85%', y: '15%', delay: 0.3, size: 'text-2xl', dur: 5.2 },
-  { emoji: '🎉', x: '7%',  y: '68%', delay: 0.5, size: 'text-lg', dur: 4.8 },
-  { emoji: '💕', x: '88%', y: '70%', delay: 0.2, size: 'text-xl', dur: 5.5 },
-  { emoji: '💫', x: '75%', y: '86%', delay: 0.4, size: 'text-base', dur: 4.2 },
-] as const;
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 export default function InvitationSuccessScreen() {
   const searchParams = useSearchParams();
-  const prefersReducedMotion = useReducedMotion();
 
   const [slug, setSlug] = useState<string>('');
   const [invitationUrl, setInvitationUrl] = useState<string>('');
@@ -27,7 +18,6 @@ export default function InvitationSuccessScreen() {
   const [copyAnnouncement, setCopyAnnouncement] = useState<string>('');
 
   useEffect(() => {
-    // 1. Resolve slug from query param or session storage
     const paramSlug = searchParams.get('slug');
     let resolvedSlug = paramSlug;
 
@@ -41,16 +31,14 @@ export default function InvitationSuccessScreen() {
 
     setSlug(resolvedSlug);
 
-    // 2. Construct absolute invitation URL
     const origin =
       typeof window !== 'undefined' && window.location.origin
         ? window.location.origin
-        : 'https://dateinvite.app';
+        : 'https://dateinvite.me';
 
     setInvitationUrl(`${origin}/invite/${resolvedSlug}`);
   }, [searchParams]);
 
-  // Copy Link action
   const handleCopyLink = async () => {
     if (!invitationUrl) return;
 
@@ -58,7 +46,6 @@ export default function InvitationSuccessScreen() {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(invitationUrl);
       } else {
-        // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = invitationUrl;
         textArea.style.position = 'fixed';
@@ -81,66 +68,40 @@ export default function InvitationSuccessScreen() {
     }
   };
 
-  // Native Share action (fallback to copy if unsupported)
   const handleNativeShare = async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
           title: "You're Invited 💌",
-          text: 'Someone has a date invitation for you.',
+          text: 'Someone has a special date invitation for you.',
           url: invitationUrl,
         });
       } catch (err: unknown) {
-        // Ignore user-cancelled share dialogs
         if ((err as Error)?.name !== 'AbortError') {
           handleCopyLink();
         }
       }
     } else {
-      // Fallback to clipboard copy
       handleCopyLink();
     }
   };
 
-  // WhatsApp share link with strict prefilled text
   const getWhatsAppShareUrl = () => {
     const message = `Hey! I made you a little invitation 💌\n\nOpen this:\n${invitationUrl}`;
     return `https://wa.me/?text=${encodeURIComponent(message)}`;
   };
 
   return (
-    <div className="screen relative overflow-hidden bg-bg min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
       {/* Accessible live region for copy announcements */}
       <div className="sr-only" aria-live="polite" role="status">
         {copyAnnouncement}
       </div>
 
-      {/* ── Background Celebration Accents ── */}
-      {!prefersReducedMotion &&
-        CELEBRATION_ACCENTS.map((item, i) => (
-          <motion.span
-            key={i}
-            aria-hidden="true"
-            className={`absolute select-none pointer-events-none ${item.size}`}
-            style={{ left: item.x, top: item.y }}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: [0, 0.55, 0.45, 0.55],
-              scale: [0, 1, 0.95, 1],
-              y: [0, -10, 0],
-            }}
-            transition={{
-              opacity: { delay: item.delay, duration: 0.8 },
-              scale:   { delay: item.delay, duration: 0.5 },
-              y:       { delay: item.delay + 0.4, duration: item.dur, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          >
-            {item.emoji}
-          </motion.span>
-        ))}
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
 
-      {/* ── Main Content Container ── */}
-      <div className="w-full max-w-md mx-auto relative z-10">
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
         {/* Success Icon & Heading */}
         <div className="text-center mb-6">
           <FadeIn delay={0.08}>
@@ -149,7 +110,7 @@ export default function InvitationSuccessScreen() {
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 20, delay: 0.1 }}
-                className="w-20 h-20 rounded-full bg-soft-pink border-2 border-primary/30 flex items-center justify-center text-4xl shadow-card"
+                className="w-20 h-20 rounded-full bg-primary-subtle border-2 border-primary/25 flex items-center justify-center text-4xl shadow-card"
               >
                 💌
               </motion.div>
@@ -157,7 +118,7 @@ export default function InvitationSuccessScreen() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 450, damping: 18, delay: 0.3 }}
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-sm shadow-button"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-button border-2 border-white"
               >
                 ✓
               </motion.div>
@@ -165,13 +126,13 @@ export default function InvitationSuccessScreen() {
           </FadeIn>
 
           <FadeIn delay={0.18}>
-            <h1 className="font-serif text-display-md text-dark mb-2.5 leading-tight text-balance">
+            <h1 className="font-serif text-3xl sm:text-4xl text-dark mb-2 leading-tight text-balance font-normal">
               Your invitation is ready&nbsp;✨
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.26}>
-            <p className="font-sans text-body-md text-muted max-w-xs mx-auto text-balance">
+            <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-xs mx-auto text-balance">
               Now send this link to the person you&apos;d love to hear from.
             </p>
           </FadeIn>
@@ -179,18 +140,18 @@ export default function InvitationSuccessScreen() {
 
         {/* Link Card & Action Container */}
         <FadeIn delay={0.34}>
-          <div className="content-card bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border space-y-6">
+          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 space-y-6">
             {/* Shareable Link Display */}
             <div>
               <label
                 htmlFor="invitation-url-display"
-                className="block text-label uppercase tracking-wider text-muted font-sans font-semibold mb-2"
+                className="block text-xs uppercase tracking-wider text-muted font-sans font-semibold mb-2"
               >
                 Your Private Invitation Link
               </label>
               <div
                 id="invitation-url-display"
-                className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-sand-50/70 border border-border text-dark text-sm sm:text-base font-mono break-all select-all group hover:border-primary/40 transition-colors"
+                className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-sand-50/80 border border-border text-dark text-xs sm:text-sm font-mono break-all select-all group hover:border-primary/40 transition-colors"
               >
                 <span className="truncate text-dark/90 font-medium">
                   {invitationUrl || 'Generating link…'}
@@ -199,7 +160,7 @@ export default function InvitationSuccessScreen() {
                   type="button"
                   onClick={handleCopyLink}
                   aria-label="Copy invitation link"
-                  className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-soft-pink/60 transition-colors flex-shrink-0"
+                  className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-primary-subtle transition-colors flex-shrink-0"
                   title="Copy to clipboard"
                 >
                   <CopyIcon />
@@ -215,7 +176,7 @@ export default function InvitationSuccessScreen() {
                 onClick={handleCopyLink}
                 fullWidth
                 id="copy-link-btn"
-                className={copied ? '!bg-emerald-600 hover:!bg-emerald-700' : ''}
+                className={copied ? '!bg-emerald-600 hover:!bg-emerald-700 py-3.5' : 'py-3.5'}
               >
                 <AnimatePresence mode="wait" initial={false}>
                   {copied ? (
@@ -250,6 +211,7 @@ export default function InvitationSuccessScreen() {
                 onClick={handleNativeShare}
                 fullWidth
                 id="share-invitation-btn"
+                className="py-3"
               >
                 <ShareIcon />
                 Share Invitation
@@ -261,7 +223,7 @@ export default function InvitationSuccessScreen() {
                 target="_blank"
                 rel="noopener noreferrer"
                 id="whatsapp-share-btn"
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-base font-semibold transition-all duration-180 bg-[#25D366] text-white hover:bg-[#20BA5A] shadow-sm hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 min-h-[44px]"
+                className="w-full inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm sm:text-base font-semibold transition-all duration-180 bg-[#25D366] text-white hover:bg-[#20BA5A] shadow-sm hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 min-h-[44px]"
               >
                 <WhatsAppIcon />
                 Share on WhatsApp
@@ -269,7 +231,7 @@ export default function InvitationSuccessScreen() {
             </div>
 
             {/* Preview link for creator testing */}
-            <div className="pt-2 border-t border-border/60 text-center">
+            <div className="pt-3 border-t border-border/60 text-center">
               <p className="text-xs text-muted mb-2">Want to see what they will see?</p>
               <Link
                 href={`/invite/${slug}`}
@@ -288,7 +250,7 @@ export default function InvitationSuccessScreen() {
           <div className="text-center mt-6">
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted hover:text-dark transition-colors py-2 px-4 rounded-full hover:bg-sand-100"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-dark transition-colors py-2 px-4 rounded-full hover:bg-sand-100"
             >
               <span>←</span>
               <span>Create Another Invitation</span>

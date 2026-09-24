@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { PublicInvitation, QuestionnaireAnswers } from '@/types';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 interface SuccessScreenProps {
   invitation: PublicInvitation;
@@ -46,6 +47,15 @@ const VIBE_LABELS: Record<string, string> = {
   spontaneous: '🎲 Spontaneous',
 };
 
+// Tasteful celebration particles
+const CONFETTI_PARTICLES = [
+  { emoji: '✨', x: '15%', delay: 0.1, dur: 3.2 },
+  { emoji: '💕', x: '82%', delay: 0.3, dur: 3.6 },
+  { emoji: '🎉', x: '25%', delay: 0.5, dur: 3.8 },
+  { emoji: '🌸', x: '75%', delay: 0.2, dur: 4.1 },
+  { emoji: '💫', x: '50%', delay: 0.4, dur: 3.4 },
+];
+
 /**
  * P14 — Success Screen
  * Final celebratory recipient state.
@@ -64,55 +74,55 @@ export default function SuccessScreen({
     headingRef.current?.focus();
   }, []);
 
-  // Soft sparkle particles positioned tastefully around the card
-  const sparkles = [
-    { top: '-12px', left: '15%', delay: 0.1, size: 'text-lg' },
-    { top: '10px', right: '12%', delay: 0.3, size: 'text-sm' },
-    { bottom: '25px', left: '8%', delay: 0.5, size: 'text-base' },
-    { bottom: '-10px', right: '18%', delay: 0.2, size: 'text-xl' },
-  ];
-
   return (
     <div
-      className="screen"
+      className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8"
       role="region"
       aria-label="Invitation Accepted"
       id="success-screen"
     >
-      <div className="relative w-full max-w-md mx-auto">
-        {/* Floating subtle sparkles in background */}
-        {!prefersReducedMotion && (
-          <div className="absolute inset-0 pointer-events-none -z-10" aria-hidden="true">
-            {sparkles.map((sp, idx) => (
-              <motion.span
-                key={idx}
-                className={`absolute select-none ${sp.size}`}
-                style={{ top: sp.top, left: sp.left, right: sp.right, bottom: sp.bottom }}
-                initial={{ opacity: 0, scale: 0.4 }}
-                animate={{
-                  opacity: [0.3, 0.9, 0.3],
-                  scale: [0.8, 1.2, 0.8],
-                  y: [0, -6, 0],
-                }}
-                transition={{
-                  duration: 2.8,
-                  repeat: Infinity,
-                  delay: sp.delay,
-                  ease: 'easeInOut',
-                }}
-              >
-                ✨
-              </motion.span>
-            ))}
-          </div>
-        )}
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
 
-        <div className="content-card text-center bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border">
+      {/* ── Floating celebratory confetti/sparkles ── */}
+      {!prefersReducedMotion && (
+        <div className="fixed inset-0 pointer-events-none -z-5 overflow-hidden" aria-hidden="true">
+          {CONFETTI_PARTICLES.map((item, idx) => (
+            <motion.span
+              key={idx}
+              className="absolute select-none text-xl sm:text-2xl"
+              style={{ left: item.x, top: '-20px' }}
+              initial={{ y: -20, opacity: 0, scale: 0.6 }}
+              animate={{
+                y: ['0vh', '105vh'],
+                opacity: [0, 0.9, 0.9, 0],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: item.dur,
+                repeat: Infinity,
+                delay: item.delay,
+                ease: 'linear',
+              }}
+            >
+              {item.emoji}
+            </motion.span>
+          ))}
+        </div>
+      )}
+
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+          className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 text-center"
+        >
           {/* Celebratory Icon & Badge */}
-          <div className="relative flex justify-center mb-6">
+          <div className="relative inline-flex items-center justify-center mb-5">
             {/* Soft pink glow backdrop */}
             <div
-              className="w-20 h-20 rounded-full bg-soft-pink flex items-center justify-center relative shadow-sm"
+              className="w-20 h-20 rounded-full bg-primary-subtle border border-primary/25 flex items-center justify-center relative shadow-sm"
               aria-hidden="true"
             >
               {!prefersReducedMotion && (
@@ -122,26 +132,29 @@ export default function SuccessScreen({
                   transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
                 />
               )}
-              {/* Checkmark + Opened Envelope Motif */}
+              {/* Party popper emoji */}
               <motion.div
-                initial={prefersReducedMotion ? {} : { scale: 0.6, rotate: -10 }}
+                initial={prefersReducedMotion ? {} : { scale: 0.7, rotate: -12 }}
                 animate={prefersReducedMotion ? {} : { scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', damping: 14, stiffness: 200 }}
+                transition={{ type: 'spring', damping: 14, stiffness: 220 }}
                 className="text-4xl select-none leading-none"
                 role="img"
-                aria-label="Celebration heart"
+                aria-label="Celebration"
               >
                 🎉
               </motion.div>
             </div>
 
             {/* Checkmark badge */}
-            <div
-              className="absolute bottom-0 right-1/2 translate-x-7 translate-y-1 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow"
+            <motion.div
+              initial={prefersReducedMotion ? {} : { scale: 0 }}
+              animate={prefersReducedMotion ? {} : { scale: 1 }}
+              transition={{ delay: 0.25, type: 'spring', stiffness: 450, damping: 18 }}
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-button border-2 border-white"
               aria-hidden="true"
             >
               ✓
-            </div>
+            </motion.div>
           </div>
 
           {/* Heading */}
@@ -149,75 +162,75 @@ export default function SuccessScreen({
             <h1
               ref={headingRef}
               tabIndex={-1}
-              className="font-serif text-display-md text-dark mb-2 leading-tight outline-none"
+              className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug outline-none font-normal"
             >
               It&apos;s a date!&nbsp;🎉
             </h1>
           </FadeIn>
 
           {/* Supporting Copy */}
-          <FadeIn delay={0.2}>
-            <p className="font-sans text-body-lg font-medium text-primary mb-2">
+          <FadeIn delay={0.18}>
+            <p className="font-sans text-base font-semibold text-primary mb-2">
               Your answer has been sent.
             </p>
           </FadeIn>
 
-          <FadeIn delay={0.3}>
-            <p className="font-sans text-body-sm text-muted mb-6 leading-relaxed max-w-xs mx-auto">
+          <FadeIn delay={0.26}>
+            <p className="font-sans text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs mx-auto text-balance">
               Your response has been recorded. {invitation.creator_name} will get your response and can take it from here.
             </p>
           </FadeIn>
 
           {/* Tasteful Summary Badge */}
-          <FadeIn delay={0.4}>
-            <div className="rounded-2xl bg-sand-50/70 border border-border p-4 mb-6 text-left">
-              <span className="block text-xs uppercase tracking-wider font-semibold text-muted/70 mb-2">
+          <FadeIn delay={0.34}>
+            <div className="rounded-2xl bg-sand-50/80 border border-border/70 p-4 mb-6 text-left">
+              <span className="block text-[11px] uppercase tracking-wider font-semibold text-muted mb-2.5">
                 What you shared
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {answers.recipient_name && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">Your Name</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Your Name</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {answers.recipient_name}
                     </span>
                   </div>
                 )}
                 {answers.date_type && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">Activity</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Activity</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {DATE_TYPE_LABELS[answers.date_type] || answers.date_type}
                     </span>
                   </div>
                 )}
                 {answers.preferred_day && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">When</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">When</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {DAY_LABELS[answers.preferred_day] || answers.preferred_day}
                     </span>
                   </div>
                 )}
                 {answers.preferred_time && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">Time</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Time</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {TIME_LABELS[answers.preferred_time] || answers.preferred_time}
                     </span>
                   </div>
                 )}
                 {answers.date_vibe && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">Vibe</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Vibe</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {VIBE_LABELS[answers.date_vibe] || answers.date_vibe}
                     </span>
                   </div>
                 )}
                 {answers.message && (
-                  <div className="bg-surface/80 rounded-xl p-2.5 border border-border/50 col-span-2">
-                    <span className="block text-muted/80 text-[10px] uppercase font-bold">Note</span>
+                  <div className="bg-white rounded-xl p-2.5 border border-border/50 col-span-2 shadow-2xs">
+                    <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Note</span>
                     <span className="font-medium text-dark italic truncate block mt-0.5">
                       &ldquo;{answers.message}&rdquo;
                     </span>
@@ -228,7 +241,7 @@ export default function SuccessScreen({
           </FadeIn>
 
           {/* Action Button */}
-          <FadeIn delay={0.5}>
+          <FadeIn delay={0.44}>
             <div className="flex flex-col gap-3">
               {onDone ? (
                 <PrimaryButton
@@ -236,13 +249,14 @@ export default function SuccessScreen({
                   onClick={onDone}
                   fullWidth
                   id="success-done-btn"
+                  className="py-3.5"
                 >
                   Done
                 </PrimaryButton>
               ) : (
                 <Link
                   href="/"
-                  className="btn-primary w-full text-center"
+                  className="btn-primary w-full text-center py-3.5"
                   id="success-home-link"
                 >
                   Done
@@ -251,13 +265,13 @@ export default function SuccessScreen({
 
               <Link
                 href="/"
-                className="text-xs font-medium text-muted hover:text-dark transition-colors py-2"
+                className="text-xs font-medium text-muted hover:text-dark transition-colors py-1.5"
               >
                 Want to ask someone out? Create your own DateInvite →
               </Link>
             </div>
           </FadeIn>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

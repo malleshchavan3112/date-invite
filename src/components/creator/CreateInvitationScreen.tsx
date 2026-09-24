@@ -2,22 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, useReducedMotion } from 'framer-motion';
 import { createInvitationAction } from '@/lib/actions';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
-
-// Decorative background accents (subtle, non-distracting, tasteful)
-const ACCENTS = [
-  { emoji: '✨', x: '8%',  y: '14%', delay: 0.1, size: 'text-base', dur: 6 },
-  { emoji: '💌', x: '88%', y: '16%', delay: 0.3, size: 'text-xl',  dur: 5 },
-  { emoji: '🌸', x: '6%',  y: '72%', delay: 0.5, size: 'text-sm',  dur: 7 },
-  { emoji: '💫', x: '84%', y: '78%', delay: 0.2, size: 'text-base',dur: 5 },
-] as const;
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 export default function CreateInvitationScreen() {
   const router = useRouter();
-  const prefersReducedMotion = useReducedMotion();
 
   const [creatorName, setCreatorName] = useState('');
   const [creatorEmail, setCreatorEmail] = useState('');
@@ -68,17 +59,15 @@ export default function CreateInvitationScreen() {
         return;
       }
 
-      // Store created slug in session storage for smooth hydration without exposing email
       if (typeof window !== 'undefined') {
         try {
           sessionStorage.setItem('dateinvite_last_slug', result.slug);
           sessionStorage.setItem('dateinvite_creator_name', result.creator_name || creatorName.trim());
         } catch {
-          // Non-critical if storage fails
+          // Non-critical
         }
       }
 
-      // Navigate to C02 (Invitation Created) passing ONLY the unpredictable slug
       router.push(`/create/success?slug=${encodeURIComponent(result.slug)}`);
     } catch {
       setErrors({ general: 'Network error occurred. Please try again.' });
@@ -87,50 +76,28 @@ export default function CreateInvitationScreen() {
   };
 
   return (
-    <div className="screen relative overflow-hidden bg-bg min-h-dvh flex flex-col justify-center items-center px-4 py-8">
-      {/* ── Decorative Background Floaters ── */}
-      {!prefersReducedMotion &&
-        ACCENTS.map((item, i) => (
-          <motion.span
-            key={i}
-            aria-hidden="true"
-            className={`absolute select-none pointer-events-none ${item.size}`}
-            style={{ left: item.x, top: item.y }}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: [0, 0.45, 0.35, 0.45],
-              scale: [0, 1, 0.95, 1],
-              y: [0, -8, 0],
-            }}
-            transition={{
-              opacity: { delay: item.delay, duration: 0.8 },
-              scale:   { delay: item.delay, duration: 0.5 },
-              y:       { delay: item.delay + 0.5, duration: item.dur, repeat: Infinity, ease: 'easeInOut' },
-            }}
-          >
-            {item.emoji}
-          </motion.span>
-        ))}
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
 
-      {/* ── Main Container ── */}
-      <div className="w-full max-w-md mx-auto relative z-10">
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
         {/* Header Content */}
         <div className="text-center mb-6">
           <FadeIn delay={0.08}>
-            <span className="inline-block text-label uppercase tracking-widest text-primary font-semibold mb-2 bg-soft-pink px-3.5 py-1 rounded-full text-xs">
+            <span className="inline-block text-xs uppercase tracking-widest text-primary font-semibold mb-2.5 bg-primary-subtle border border-primary/20 px-3.5 py-1 rounded-full">
               Date Invitation
             </span>
           </FadeIn>
 
           <FadeIn delay={0.16}>
-            <h1 className="font-serif text-display-md text-dark mb-2.5 leading-tight text-balance">
+            <h1 className="font-serif text-3xl sm:text-4xl text-dark mb-2.5 leading-tight text-balance font-normal">
               Plan a date.<br />
               <span className="text-primary italic">Make it unforgettable.</span>
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.24}>
-            <p className="font-sans text-body-md text-muted max-w-xs mx-auto text-balance">
+            <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-xs mx-auto text-balance">
               Create a private invitation and send it to someone special.
             </p>
           </FadeIn>
@@ -138,7 +105,7 @@ export default function CreateInvitationScreen() {
 
         {/* Form Card */}
         <FadeIn delay={0.32}>
-          <div className="content-card bg-surface rounded-3xl p-6 sm:p-8 shadow-card border border-border">
+          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300">
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* General error banner */}
               {errors.general && (
@@ -157,7 +124,7 @@ export default function CreateInvitationScreen() {
               <div>
                 <label
                   htmlFor="creator-name-input"
-                  className="block text-label uppercase tracking-wider text-muted font-sans font-semibold mb-2"
+                  className="block text-xs uppercase tracking-wider text-muted font-sans font-semibold mb-2"
                 >
                   Your Name
                 </label>
@@ -179,7 +146,7 @@ export default function CreateInvitationScreen() {
                     aria-invalid={!!errors.name}
                     aria-describedby={errors.name ? 'creator-name-error' : undefined}
                     disabled={isLoading}
-                    className={`w-full px-4 py-3.5 rounded-2xl border text-dark bg-sand-50/60 placeholder:text-muted/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-base min-h-[48px] ${
+                    className={`w-full px-4 py-3.5 rounded-2xl border text-dark bg-sand-50/70 placeholder:text-muted/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-base min-h-[48px] ${
                       errors.name ? 'border-primary ring-1 ring-primary/30' : 'border-border focus:border-primary'
                     }`}
                   />
@@ -196,7 +163,7 @@ export default function CreateInvitationScreen() {
               <div>
                 <label
                   htmlFor="creator-email-input"
-                  className="block text-label uppercase tracking-wider text-muted font-sans font-semibold mb-2"
+                  className="block text-xs uppercase tracking-wider text-muted font-sans font-semibold mb-2"
                 >
                   Your Email
                 </label>
@@ -218,7 +185,7 @@ export default function CreateInvitationScreen() {
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? 'creator-email-error' : 'creator-email-helper'}
                     disabled={isLoading}
-                    className={`w-full px-4 py-3.5 rounded-2xl border text-dark bg-sand-50/60 placeholder:text-muted/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-base min-h-[48px] ${
+                    className={`w-full px-4 py-3.5 rounded-2xl border text-dark bg-sand-50/70 placeholder:text-muted/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-base min-h-[48px] ${
                       errors.email ? 'border-primary ring-1 ring-primary/30' : 'border-border focus:border-primary'
                     }`}
                   />
@@ -245,6 +212,7 @@ export default function CreateInvitationScreen() {
                   fullWidth
                   loading={isLoading}
                   id="create-invitation-btn"
+                  className="py-4 text-base sm:text-lg"
                 >
                   Create My Invitation
                 </PrimaryButton>

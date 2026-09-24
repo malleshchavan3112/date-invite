@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import { FadeIn } from '@/components/ui/PageTransition';
+import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
 interface PlayfulNoProps {
   onActuallyYes: () => void;
@@ -12,36 +12,34 @@ interface PlayfulNoProps {
 }
 
 // ─── Content per attempt ────────────────────────────────────────────────────
-// attempts: 1 = just arrived, 2 = first in-screen dodge, 3 = second in-screen dodge → modal
 const MESSAGES = [
-  null, // index 0 — unused
+  null,
   { heading: 'Hmm, are you sure? 🤔', body: 'The button seems a little slippery today…' },
-  { heading: 'Really though? 😅',      body: 'It\'s really trying to avoid you…' },
-  { heading: 'Okay, one last thing.',  body: 'We just need to confirm…' }, // modal opens instead
+  { heading: 'Really though? 😅', body: "It's trying its best to change your mind…" },
+  { heading: 'Okay, one last thing.', body: 'We just want to make sure…' },
 ] as const;
 
-// Where the NO button drifts — bounded within the card (safe for 320px+)
+// Where the NO button drifts safely within card bounds
 const DODGE_POSITIONS: Array<{ x: number; y: number }> = [
-  { x: 0,    y: 0   }, // attempt 0 — initial (unused)
-  { x: 78,   y: -42 }, // attempt 1 — entered from P03 (first dodge)
-  { x: -82,  y: 52  }, // attempt 2 — first in-P04 click
-  { x: 92,   y: 38  }, // attempt 3 — second in-P04 click (then modal)
+  { x: 0, y: 0 },
+  { x: 70, y: -24 },
+  { x: -75, y: 32 },
+  { x: 80, y: 22 },
 ];
 
 /**
  * P04 — Playful NO State
  * - Maximum 3 attempts total (D006)
- * - NO button dodges on each attempt (reduced-motion: stays put)
+ * - NO button playfully evades (reduced-motion: stays put)
  * - After 3 attempts: confirmation modal
  * - Never silently converts NO to YES (D006)
  */
 export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps) {
-  // Start at attempt 1 — they already clicked NO in P03
   const [attempts, setAttempts] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const yesActed = useRef(false);
-  const noActed = useRef(false); // per-click guard
+  const noActed = useRef(false);
 
   const currentMsg = MESSAGES[Math.min(attempts, MESSAGES.length - 1)];
   const dodgePos = prefersReducedMotion
@@ -51,14 +49,14 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
   const handleNoDodge = useCallback(() => {
     if (noActed.current) return;
     noActed.current = true;
-    // Release the guard after a short delay so they can try again
-    setTimeout(() => { noActed.current = false; }, 600);
+    setTimeout(() => {
+      noActed.current = false;
+    }, 500);
 
     const next = attempts + 1;
     if (next >= 3) {
-      // Third attempt: dodge one last time then show modal
       setAttempts(next);
-      setTimeout(() => setShowModal(true), prefersReducedMotion ? 0 : 500);
+      setTimeout(() => setShowModal(true), prefersReducedMotion ? 0 : 450);
     } else {
       setAttempts(next);
     }
@@ -77,50 +75,53 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
   }, [onConfirmNo]);
 
   return (
-    <div className="screen relative overflow-hidden">
+    <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
+      {/* ── Ambient Decorative Background ── */}
+      <DecorativeBackground />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        className="content-card text-center max-w-sm mx-auto relative"
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full max-w-sm sm:max-w-md mx-auto bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 relative z-10 text-center"
       >
         {/* Animated heading — swaps per attempt */}
         <AnimatePresence mode="wait">
           <motion.div
             key={attempts}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
           >
-            <h1 className="font-serif text-display-md text-dark mb-3 text-balance">
+            <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 text-balance leading-snug font-normal">
               {currentMsg?.heading}
             </h1>
-            <p className="font-sans text-body-md text-muted mb-6">
+            <p className="font-sans text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed">
               {currentMsg?.body}
             </p>
           </motion.div>
         </AnimatePresence>
 
         {/* Question reminder */}
-        <p className="font-sans text-body-sm text-muted/50 italic mb-8">
-          "Would you go on a date with me?"
+        <p className="font-sans text-xs text-muted/70 italic mb-6">
+          &ldquo;Will you go on a date with me?&rdquo;
         </p>
 
         {/* YES — always prominent, always accessible */}
         <PrimaryButton
           onClick={handleActuallyYes}
           fullWidth
-          className="mb-6"
+          className="mb-5 text-base sm:text-lg"
           id="actually-yes-btn"
           aria-label="Change my mind — actually yes"
         >
           Actually YES ❤️
         </PrimaryButton>
 
-        {/* NO — dodges within a spacious container */}
+        {/* NO — dodges playfully within bounded arena */}
         <div
-          className="relative h-16 flex items-center justify-center"
+          className="relative h-16 flex items-center justify-center overflow-visible"
           aria-label="No button area"
         >
           <motion.div
@@ -130,25 +131,25 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
                 ? { duration: 0.01 }
                 : {
                     type: 'spring',
-                    stiffness: 280,
-                    damping: 18,
-                    mass: 0.8,
+                    stiffness: 300,
+                    damping: 20,
+                    mass: 0.7,
                   }
             }
           >
-            {/* Wiggle on entrance */}
             <motion.div
-              initial={prefersReducedMotion ? {} : { rotate: -8 }}
-              animate={prefersReducedMotion ? {} : { rotate: [0, -6, 6, -4, 3, 0] }}
-              transition={{ delay: 0.3, duration: 0.55, ease: 'easeInOut' }}
+              initial={prefersReducedMotion ? {} : { rotate: -6 }}
+              animate={prefersReducedMotion ? {} : { rotate: [0, -5, 5, -3, 3, 0] }}
+              transition={{ delay: 0.2, duration: 0.5, ease: 'easeInOut' }}
             >
               <SecondaryButton
                 onClick={handleNoDodge}
                 id="no-dodge-btn"
                 aria-label={`No — attempt ${attempts} of 3`}
-                className="whitespace-nowrap text-sm"
+                className="whitespace-nowrap text-sm px-6 py-2.5"
               >
-                NO 😏
+                <span>NO</span>
+                <span className="text-xs" aria-hidden="true">😏</span>
               </SecondaryButton>
             </motion.div>
           </motion.div>
@@ -156,7 +157,7 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
 
         {/* Attempt counter — subtle accessibility aid */}
         <p
-          className="font-sans text-body-sm text-muted/40 mt-3"
+          className="font-sans text-xs text-muted/60 mt-3"
           aria-live="polite"
           aria-atomic="true"
         >
@@ -187,7 +188,6 @@ interface ConfirmNoModalProps {
 }
 
 function ConfirmNoModal({ onYes, onNo }: ConfirmNoModalProps) {
-  // Trap focus on mount
   const firstBtnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     firstBtnRef.current?.focus();
@@ -202,7 +202,7 @@ function ConfirmNoModal({ onYes, onNo }: ConfirmNoModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 bg-dark/45 backdrop-blur-sm z-30"
+        className="fixed inset-0 bg-dark/40 backdrop-blur-sm z-40"
       />
 
       {/* Modal — bottom sheet on mobile, centered on sm+ */}
@@ -213,25 +213,27 @@ function ConfirmNoModal({ onYes, onNo }: ConfirmNoModalProps) {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 30 }}
-        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        className="fixed inset-x-0 bottom-0 z-40 flex justify-center sm:inset-0 sm:items-center sm:p-8"
+        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        className="fixed inset-x-0 bottom-0 z-50 flex justify-center sm:inset-0 sm:items-center sm:p-6"
       >
-        <div className="w-full max-w-sm bg-surface rounded-t-[2rem] sm:rounded-[2rem] px-8 pt-8 pb-10 sm:pb-8 shadow-2xl">
+        <div className="w-full max-w-sm bg-surface rounded-t-[2.25rem] sm:rounded-[2.25rem] px-7 pt-7 pb-9 sm:pb-8 shadow-2xl border border-border/80">
           {/* Handle (mobile) */}
-          <div className="w-10 h-1 bg-border rounded-full mx-auto mb-6 sm:hidden" aria-hidden="true" />
+          <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5 sm:hidden" aria-hidden="true" />
 
           <div className="text-center">
-            <p className="text-4xl mb-4 select-none" aria-hidden="true">😏</p>
+            <span className="text-4xl mb-3 block select-none" aria-hidden="true">
+              😏
+            </span>
 
             <h2
               id="modal-heading"
-              className="font-serif text-display-md text-dark mb-2"
+              className="font-serif text-2xl text-dark mb-2 font-normal"
             >
               Nice try.
             </h2>
 
-            <p className="font-sans text-body-md text-muted mb-8">
-              But is this your <em>final</em> answer?
+            <p className="font-sans text-sm text-muted-foreground mb-6 leading-relaxed">
+              Is this your <em>final</em> answer?
             </p>
 
             <div className="flex flex-col gap-3">

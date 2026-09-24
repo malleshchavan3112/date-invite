@@ -10,19 +10,22 @@
   --color-primary: #FF4F7B;
   --color-primary-hover: #E8436B;
   --color-primary-light: #FF7A9B;
+  --color-primary-subtle: #FFF0F3;
   --color-dark: #1F1F1F;
   --color-soft-pink: #FFE4EC;
-  --color-muted: #777777;
+  --color-muted: #6B7280;
+  --color-muted-foreground: #4B5563;
   --color-surface: #FFFFFF;
   --color-border: #F0D6DF;
 
   --font-serif: 'DM Serif Display', 'Playfair Display', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  --radius-card: 1.5rem;
+  --radius-card: 1.75rem;
   --radius-button: 3rem;
 
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(255,79,123,0.08);
+  --shadow-card: 0 4px 20px -2px rgba(255,79,123,0.07), 0 2px 6px -1px rgba(0,0,0,0.03);
+  --shadow-card-elevated: 0 16px 40px -8px rgba(255,79,123,0.12), 0 4px 16px -2px rgba(0,0,0,0.04);
   --shadow-button: 0 4px 14px rgba(255,79,123,0.35);
 
   --duration-micro: 180ms;
@@ -42,6 +45,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -58,7 +62,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* ─── Touch Targets ─────────────────────────────────────────────────────── */
@@ -113,51 +117,53 @@ button, a, [role="button"] {
   /* Primary button base */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2
-           bg-primary text-white font-sans font-semibold
-           rounded-full px-8 py-4 text-lg
-           shadow-button
+           bg-gradient-to-r from-primary to-[#FF3B6F] text-white font-sans font-semibold
+           rounded-full px-8 py-3.5 text-base sm:text-lg
+           shadow-button min-h-[48px]
            transition-all duration-180
-           hover:bg-primary-hover hover:shadow-button-hover hover:-translate-y-0.5
-           active:translate-y-0 active:shadow-button
+           hover:shadow-button-hover hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
   }
 
   /* Secondary button base */
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
-           bg-transparent text-muted font-sans font-medium
-           rounded-full px-6 py-3 text-base
-           border border-border
+           bg-white/80 text-dark font-sans font-medium
+           rounded-full px-6 py-3 text-sm sm:text-base
+           border border-border/90 shadow-sm min-h-[44px]
            transition-all duration-180
-           hover:text-dark hover:border-primary/30
+           hover:bg-white hover:border-primary/40 hover:text-primary hover:shadow
+           active:scale-[0.98]
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
   }
 
   /* Choice card base */
   .choice-card {
     @apply flex flex-col items-center justify-center gap-2
-           bg-surface rounded-3xl p-5
-           border-2 border-border
-           shadow-card
+           bg-surface/95 rounded-2xl sm:rounded-3xl p-4 sm:p-5
+           border-2 border-border/80
+           shadow-card min-h-[72px]
            cursor-pointer
            transition-all duration-250
            hover:border-primary/40 hover:shadow-card-hover hover:-translate-y-0.5
-           active:translate-y-0;
+           active:translate-y-0 active:scale-[0.99]
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
   }
 
   .choice-card.selected {
-    @apply border-primary bg-soft-pink shadow-card-hover;
+    @apply border-primary bg-primary-subtle shadow-card-hover;
   }
 
   /* Screen container */
   .screen {
     @apply min-h-dvh flex flex-col items-center justify-center
-           px-5 py-10 pt-safe pb-safe;
+           px-4 sm:px-6 py-6 sm:py-10 pt-safe pb-safe;
   }
 
   /* Content card */
   .content-card {
-    @apply w-full max-w-md bg-surface rounded-3xl p-8 shadow-card;
+    @apply w-full max-w-md bg-surface/95 backdrop-blur-md rounded-3xl p-6 sm:p-8
+           shadow-card border border-border/80 transition-shadow duration-300;
   }
 }
 
