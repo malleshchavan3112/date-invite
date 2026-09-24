@@ -1,6 +1,29 @@
 # Changelog
 
-All notable changes to the DateInvite project are documented in this file.
+## [Phase 6.0] — 2026-09-24
+
+### Added
+- **Resend Transactional Email Notification Pipeline (`src/lib/email/`)**:
+  - `resend.ts`: Server-only Resend client factory with fallback configuration and sender resolution (`getResendClient`, `getSenderEmail`, `getAppBaseUrl`).
+  - `invitation-response-email.ts`: Responsive, email-client-compatible HTML and plain-text template generators (`generateResponseEmailHtml`, `generateResponseEmailText`) with XSS escaping (`escapeHtml`), romantic branding, YES badge, questionnaire details summary table, and public CTA.
+  - `send-response-notification.ts`: Core dispatcher function (`sendInvitationResponseEmail`) with input validation, deterministic idempotency key (`dateinvite-response/${responseId}`), and safe error handling.
+  - `index.ts`: Module export hub for email services.
+- **Persistence-First Sequence & Asymmetric Failure Handling (`src/lib/response-repository.ts`)**:
+  - Wired notification dispatch to trigger strictly after response is successfully saved to Supabase.
+  - Handled Resend failures gracefully without rolling back or deleting valid Supabase records.
+  - Return `{ success: true, response, emailSent }` payload.
+- **Email Verification & Test Suites**:
+  - `scripts/test-email-unit.ts`: Comprehensive 27-assertion test suite covering Cases A through E, XSS sanitization, 300-char message boundary, deterministic idempotency, and public slug privacy.
+  - `scripts/test-email.ts`: End-to-end integration test runner validating real email dispatch via Resend and querying Testmail inbox via JSON API.
+  - `scripts/test-e2e-simulation.ts`: 8-step complete lifecycle simulation against live Supabase database verifying creation, privacy firewall, response submission, email generation, duplicate rejection, and inactive invitation rejection.
+- **Architectural Decisions (D021, D022, D023)**:
+  - D021: Server-side Resend architecture with creator email privacy isolation.
+  - D022: Deterministic email idempotency key (`dateinvite-response/${responseId}`).
+  - D023: Asymmetric failure isolation (persistence over notification).
+- **Environment & Onboarding (`.env.example`)**:
+  - Added documentation and placeholders for `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NEXT_PUBLIC_APP_URL`, `TESTMAIL_API_KEY`, and `TESTMAIL_NAMESPACE`.
+
+---
 
 ## [Phase 5.0] — 2026-09-24
 

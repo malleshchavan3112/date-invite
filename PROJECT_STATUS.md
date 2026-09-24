@@ -1,7 +1,7 @@
 # Project Status
 
 ## Current Phase
-PHASE 5 COMPLETE — Supabase Database + Invitation / Response Persistence (Built, Linked & Verified) • Next: Phase 6 (Resend Email Integration)
+PHASE 6 COMPLETE — Resend + Testmail Email Notification Integration (Built, Tested & Verified) • Next: Phase 7
 
 ---
 
@@ -13,6 +13,31 @@ The product architecture has transitioned to a **two-sided invitation model**:
 ---
 
 ## Completed Milestones
+
+### Phase 6 — Resend + Testmail Email Notification Integration ✅
+- [x] **Resend Transactional Email Engine (`src/lib/email/`)**:
+  - `resend.ts`: Server-only factory providing singleton Resend client, sender resolution (`getSenderEmail`), and public link URL resolution (`getAppBaseUrl`).
+  - `invitation-response-email.ts`: Responsive, cross-client HTML and plain-text template generator with inline CSS, romantic palette, celebratory YES badge, breakdown table (Recipient, Date Type, Preferred Day, Time, Vibe, Note), and public invitation CTA (`/invite/[slug]`).
+  - `send-response-notification.ts`: Secure email dispatcher (`sendInvitationResponseEmail`) with input validation, deterministic idempotency key (`dateinvite-response/${responseId}`), and safe error handling.
+- [x] **Persistence-First Sequence & Asymmetric Failure Isolation**:
+  - Email sending strictly happens AFTER Supabase response is safely inserted.
+  - If Supabase fails: email is never dispatched, preserving recipient answers and allowing retry via P16.
+  - If Resend fails: Supabase response is preserved and never rolled back; recipient reaches celebratory P14 confirmation while failure is recorded in server-side logs.
+- [x] **Idempotency & Duplicate Protection**:
+  - Rejection of duplicate responses at both application and database layers (`UNIQUE(invitation_id)`) prevents duplicate email triggers.
+  - Deterministic idempotency key passed to Resend (`dateinvite-response/${responseId}`) prevents duplicate dispatch on network retries.
+- [x] **Privacy Firewall Verification**:
+  - Recipient frontend never receives `creator_email`.
+  - Recipient client cannot specify destination email.
+  - Creator email is queried strictly on server from trusted invitation record.
+  - Public invitation link in email body strictly uses high-entropy slug (never internal Supabase UUID).
+- [x] **Automated Verification Suites**:
+  - `scripts/test-email-unit.ts`: 27 passed assertions covering Cases A–E, XSS escaping, 300-char message limit, and idempotency key.
+  - `scripts/test-supabase.ts`: All 7 live Supabase integration tests passing.
+  - `scripts/test-e2e-simulation.ts`: All 8 full-lifecycle simulation steps passing against live database.
+  - `scripts/test-email.ts`: Live Resend + Testmail integration test runner.
+  - `npx tsc --noEmit`: 0 TypeScript errors.
+  - `npm run build`: Production build passes with 0 errors across all routes.
 
 ### Phase 5 — Supabase Database + Invitation / Response Persistence ✅
 - [x] **Supabase Project Linked & Migrated**: Connected to live Supabase project `dateinvite` (`rscybfaxhpesbpvmjyhk` on `ap-south-1`).
@@ -120,5 +145,5 @@ The product architecture has transitioned to a **two-sided invitation model**:
 ---
 
 ## Next Steps
-1. Stop after Phase 4 per critical stop condition.
-2. Await instruction for Phase 5: Supabase Database Integration.
+1. Phase 6 complete (Resend + Testmail transactional email notifications).
+2. Stop after Phase 6 per critical stop condition. Do not move to Phase 7 until instructed.

@@ -22,6 +22,7 @@ import type {
 } from '@/types';
 import { getSupabaseServerClient } from './supabase/server';
 import { getInvitationById } from './invitation-repository';
+import { sendInvitationResponseEmail } from './email';
 
 /**
  * Retrieve a response by invitation ID.
@@ -219,9 +220,32 @@ export async function submitResponse(
       submitted_at: data.submitted_at || data.created_at,
     };
 
+    // 6. Dispatch transactional notification email via Resend
+    let emailSent = false;
+    try {
+      const emailResult = await sendInvitationResponseEmail({
+        creatorEmail: invitation.creator_email,
+        creatorName: invitation.creator_name,
+        invitationSlug: invitation.slug,
+        responseId: response.id,
+        recipientName: response.recipient_name || 'Someone',
+        answer: response.answer,
+        dateType: response.date_type,
+        preferredDay: response.preferred_day,
+        preferredTime: response.preferred_time,
+        dateVibe: response.date_vibe,
+        message: response.message,
+      });
+      emailSent = emailResult.success;
+    } catch (emailErr) {
+      console.error('[response-repository] Unexpected error dispatching notification email:', emailErr);
+      emailSent = false;
+    }
+
     return {
       success: true,
       response,
+      emailSent,
     };
   } catch (err) {
     console.error('[response-repository] Exception inserting response:', err);

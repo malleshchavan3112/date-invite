@@ -140,8 +140,42 @@ export interface SubmitResponseInput {
 export interface SubmitResponseResult {
   success: boolean;
   response?: Response;
+  emailSent?: boolean;
   code?: SubmissionErrorCode;
   error?: string;
+}
+
+// ─── Email Notification ───────────────────────────────────────────────────
+
+export interface SendInvitationResponsePayload {
+  creatorEmail: string;
+  creatorName: string;
+  invitationSlug: string;
+  responseId: string;
+  recipientName: string;
+  answer: 'yes' | 'no';
+  dateType: DateType | null;
+  preferredDay: PreferredDay | null;
+  preferredTime: PreferredTime | null;
+  dateVibe: DateVibe | null;
+  message?: string | null;
+}
+
+export interface SendEmailResult {
+  success: boolean;
+  messageId?: string;
+  error?: string;
+}
+
+export interface ResponseEmailData {
+  creatorName: string;
+  recipientName: string;
+  dateType: string;
+  preferredDay: string;
+  preferredTime: string;
+  dateVibe: string;
+  message?: string | null;
+  invitationUrl: string;
 }
 
 // ─── App State ───────────────────────────────────────────────────────────

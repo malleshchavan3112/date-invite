@@ -72,3 +72,12 @@ Duplicate responses to the same invitation are guarded at two independent layers
 1. Application layer: `hasResponseForInvitation(invitationId)` check before insert returns early with `ALREADY_SUBMITTED`.
 2. Database layer: PostgreSQL `UNIQUE (invitation_id)` constraint on the `responses` table throws error code `23505` on race conditions, which the repository catches and gracefully surfaces as `ALREADY_SUBMITTED`.
 
+## D021 — Server-Side Resend Email Architecture (2026-09-24)
+Transactional email dispatch is executed strictly on the server side using the official Resend SDK. `RESEND_API_KEY` is never exposed in client bundles or public APIs. Recipient clients never pass `creator_email`; the recipient endpoint looks up the trusted `creator_email` directly from the server-side invitation record in Supabase. Email sending occurs strictly after database persistence succeeds.
+
+## D022 — Deterministic Email Idempotency Key (2026-09-24)
+To prevent accidental duplicate notifications across network retries, browser re-submits, or double clicks, each email dispatch sends a deterministic idempotency key formatted as `dateinvite-response/${responseId}` using Resend's native idempotency support (`{ idempotencyKey }` and `Idempotency-Key` header). The same database response identity always yields the same idempotency key.
+
+## D023 — Asymmetric Failure Isolation: Persistence over Notification (2026-09-24)
+If Supabase response persistence fails, email transmission is never attempted and the error is returned to the recipient with preserved inputs for retry. Conversely, if Supabase succeeds but Resend delivery fails (e.g. rate limit, provider outage, missing API key), the persisted database response is never rolled back or deleted. The operation returns `{ success: true, emailSent: false }`, allowing the recipient to reach success P14 without technical error exposure while server-side logs capture delivery failure.
+
