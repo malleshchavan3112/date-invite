@@ -54,7 +54,7 @@ export default function RecipientNameStep({
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={1}
-            totalSteps={6}
+            totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
           />

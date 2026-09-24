@@ -7,31 +7,32 @@ import QuestionnaireProgress from './QuestionnaireProgress';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
 import DateInviteCard from '@/components/ui/DateInviteCard';
 
-interface PreferredDayStepProps {
+interface ActivityPreferenceStepProps {
   value: string;
-  onContinue: (day: string) => void;
+  onContinue: (activity: string) => void;
   onBack: () => void;
   isEditingFromReview?: boolean;
 }
 
-const DAYS = [
-  { id: 'weekday', label: 'Weekday', emoji: '🗓️', description: 'Monday – Thursday' },
-  { id: 'friday', label: 'Friday', emoji: '🥂', description: 'Kick off the weekend' },
-  { id: 'saturday', label: 'Saturday', emoji: '🌅', description: 'Classic date night' },
-  { id: 'sunday', label: 'Sunday', emoji: '☕', description: 'Relaxed & easygoing' },
-  { id: 'any', label: 'Any day', emoji: '💫', description: 'Flexible with anything' },
+const ACTIVITIES = [
+  { id: 'outdoor',    label: 'Outdoors',   emoji: '🌿', description: 'Fresh air & open spaces' },
+  { id: 'indoor',     label: 'Indoors',    emoji: '🏠', description: 'Cozy & sheltered' },
+  { id: 'active',     label: 'Active',     emoji: '🏃', description: 'Moving & energetic' },
+  { id: 'relaxed',    label: 'Relaxed',    emoji: '🛋️', description: 'Slow & easy-paced' },
+  { id: 'cultural',   label: 'Cultural',   emoji: '🎭', description: 'Art, music, or history' },
+  { id: 'surprise_me', label: 'Surprise Me', emoji: '🎲', description: 'You choose, I trust you' },
 ] as const;
 
 /**
- * P08 — Preferred Day
- * Single-selection choice cards for preferred date day.
+ * P08 — Activity Preference (Phase 8)
+ * Single-selection choice cards for preferred activity setting.
  */
-export default function PreferredDayStep({
+export default function ActivityPreferenceStep({
   value,
   onContinue,
   onBack,
   isEditingFromReview = false,
-}: PreferredDayStepProps) {
+}: ActivityPreferenceStepProps) {
   const [selected, setSelected] = useState<string>(value);
 
   const handleContinue = () => {
@@ -49,7 +50,7 @@ export default function PreferredDayStep({
         <DateInviteCard>
           {/* Header progress & back */}
           <QuestionnaireProgress
-            currentStep={5}
+            currentStep={3}
             totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
@@ -58,24 +59,24 @@ export default function PreferredDayStep({
           {/* Question & Supporting Copy */}
           <div className="mb-6 text-left">
             <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-              When are you{' '}
-              <span className="font-serif italic text-primary">usually free?</span>&nbsp;🗓️
+              What kind of{' '}
+              <span className="font-serif italic text-primary">vibe are you feeling?</span>&nbsp;🌿
             </h1>
             <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-              Pick whatever day works best for your schedule.
+              Think about how you'd love to spend the time.
             </p>
           </div>
 
-          {/* Choice Cards List */}
+          {/* Choice Cards Grid */}
           <div
-            className="space-y-2.5 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-6"
             role="radiogroup"
-            aria-label="Preferred day options"
+            aria-label="Activity preference options"
           >
-            {DAYS.map((item) => (
+            {ACTIVITIES.map((item) => (
               <ChoiceCard
                 key={item.id}
-                id={`preferred-day-${item.id}`}
+                id={`activity-${item.id}`}
                 label={item.label}
                 emoji={item.emoji}
                 description={item.description}
@@ -91,7 +92,7 @@ export default function PreferredDayStep({
             onClick={handleContinue}
             disabled={!selected}
             fullWidth
-            id="preferred-day-continue-btn"
+            id="activity-continue-btn"
             className="py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover"
           >
             {isEditingFromReview ? 'Save & Return to Review' : 'Continue'}

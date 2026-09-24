@@ -7,7 +7,18 @@ import type { QuestionnaireAnswers } from '@/types';
 
 interface ReviewAnswersStepProps {
   answers: QuestionnaireAnswers;
-  onEditStep: (stepKey: 'name' | 'date-type' | 'preferred-day' | 'preferred-time' | 'date-vibe' | 'message') => void;
+  onEditStep: (
+    stepKey:
+      | 'name'
+      | 'date-type'
+      | 'activity'
+      | 'location'
+      | 'preferred-day'
+      | 'preferred-time'
+      | 'food'
+      | 'spontaneity'
+      | 'message'
+  ) => void;
   onBack: () => void;
   onContinue: () => void;
 }
@@ -21,33 +32,59 @@ const DATE_TYPE_LABELS: Record<string, string> = {
   surprise: 'Surprise',
 };
 
+const ACTIVITY_LABELS: Record<string, string> = {
+  outdoor:     'Outdoors',
+  indoor:      'Indoors',
+  active:      'Active',
+  relaxed:     'Relaxed',
+  cultural:    'Cultural',
+  surprise_me: 'Surprise Me',
+};
+
+const LOCATION_LABELS: Record<string, string> = {
+  city_center:  'City Center',
+  neighborhood: 'Local Area',
+  nature:       'Nature',
+  waterfront:   'Waterfront',
+  anywhere:     'Anywhere',
+};
+
 const DAY_LABELS: Record<string, string> = {
-  weekday: 'Weekday',
-  friday: 'Friday',
+  weekday:  'Weekday',
+  friday:   'Friday',
   saturday: 'Saturday',
-  sunday: 'Sunday',
-  any: 'Any day',
+  sunday:   'Sunday',
+  any:      'Any day',
 };
 
 const TIME_LABELS: Record<string, string> = {
-  morning: 'Morning',
+  morning:   'Morning',
   afternoon: 'Afternoon',
-  evening: 'Evening',
-  night: 'Night',
+  evening:   'Evening',
+  night:     'Night',
 };
 
-const VIBE_LABELS: Record<string, string> = {
-  cozy: 'Cozy',
-  romantic: 'Romantic',
-  fun: 'Fun',
-  fancy: 'Fancy',
-  chill: 'Chill',
-  spontaneous: 'Spontaneous',
+const FOOD_LABELS: Record<string, string> = {
+  no_preference: 'No Preference',
+  vegetarian:    'Vegetarian',
+  vegan:         'Vegan',
+  seafood:       'Seafood',
+  street_food:   'Street Food',
+  fine_dining:   'Fine Dining',
+  no_food:       'No Food',
+};
+
+const SPONTANEITY_LABELS: Record<string, string> = {
+  full_plan:     'Fully Planned',
+  loose_plan:    'Loose Plan',
+  go_with_flow:  'Go with the Flow',
+  surprise_me:   'Surprise Me!',
 };
 
 /**
- * P12 — Review Answers
+ * P15 — Review Answers (Phase 8)
  * Consolidated summary card styled like an elegant date plan dossier.
+ * Now shows all 9 preference dimensions.
  */
 export default function ReviewAnswersStep({
   answers,
@@ -65,10 +102,24 @@ export default function ReviewAnswersStep({
     },
     {
       key: 'date-type' as const,
-      label: 'DATE',
+      label: 'DATE TYPE',
       icon: '🍽️',
       value: DATE_TYPE_LABELS[answers.date_type] || answers.date_type || 'None selected',
       hasValue: !!answers.date_type,
+    },
+    {
+      key: 'activity' as const,
+      label: 'ACTIVITY',
+      icon: '🌿',
+      value: ACTIVITY_LABELS[answers.activity_preference] || answers.activity_preference || 'None selected',
+      hasValue: !!answers.activity_preference,
+    },
+    {
+      key: 'location' as const,
+      label: 'SETTING',
+      icon: '🗺️',
+      value: LOCATION_LABELS[answers.location_preference] || answers.location_preference || 'None selected',
+      hasValue: !!answers.location_preference,
     },
     {
       key: 'preferred-day' as const,
@@ -85,11 +136,18 @@ export default function ReviewAnswersStep({
       hasValue: !!answers.preferred_time,
     },
     {
-      key: 'date-vibe' as const,
-      label: 'VIBE',
-      icon: '💫',
-      value: VIBE_LABELS[answers.date_vibe] || answers.date_vibe || 'None selected',
-      hasValue: !!answers.date_vibe,
+      key: 'food' as const,
+      label: 'FOOD',
+      icon: '🍽️',
+      value: FOOD_LABELS[answers.food_preference] || answers.food_preference || 'None selected',
+      hasValue: !!answers.food_preference,
+    },
+    {
+      key: 'spontaneity' as const,
+      label: 'PLAN STYLE',
+      icon: '🎁',
+      value: SPONTANEITY_LABELS[answers.spontaneity] || answers.spontaneity || 'None selected',
+      hasValue: !!answers.spontaneity,
     },
   ];
 
@@ -127,7 +185,7 @@ export default function ReviewAnswersStep({
           </div>
 
           {/* Heading */}
-          <div className="mb-6 text-left">
+          <div className="mb-5 text-left">
             <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
               Okay... let&apos;s see{' '}
               <span className="font-serif italic text-primary">what we&apos;ve planned</span>&nbsp;👀
@@ -138,7 +196,7 @@ export default function ReviewAnswersStep({
           </div>
 
           {/* Date Plan Cards Grid */}
-          <div className="grid grid-cols-2 gap-2.5 mb-3">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             {planItems.map((item) => (
               <div
                 key={item.key}
@@ -168,7 +226,7 @@ export default function ReviewAnswersStep({
               </div>
             ))}
 
-            {/* Note card spanning full width if present or editable */}
+            {/* Note card spanning full width */}
             <div className="col-span-2 bg-white/80 border border-primary/15 rounded-2xl p-3 shadow-2xs flex flex-col justify-between hover:border-primary/30 transition-colors">
               <div className="flex items-center justify-between gap-1 mb-1">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-muted flex items-center gap-1">

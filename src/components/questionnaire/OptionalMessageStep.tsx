@@ -46,8 +46,8 @@ export default function OptionalMessageStep({
         <DateInviteCard>
           {/* Header progress & back */}
           <QuestionnaireProgress
-            currentStep={6}
-            totalSteps={6}
+            currentStep={9}
+            totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
           />

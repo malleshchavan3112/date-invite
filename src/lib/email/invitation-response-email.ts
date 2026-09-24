@@ -47,6 +47,40 @@ export const VIBE_LABELS: Record<string, string> = {
   spontaneous: '🎲 Spontaneous',
 };
 
+export const ACTIVITY_LABELS: Record<string, string> = {
+  outdoor:     '🌿 Outdoors',
+  indoor:      '🏠 Indoors',
+  active:      '🏃 Active',
+  relaxed:     '🛋️ Relaxed',
+  cultural:    '🎭 Cultural',
+  surprise_me: '🎲 Surprise Me',
+};
+
+export const LOCATION_LABELS: Record<string, string> = {
+  city_center:  '🏙️ City Center',
+  neighborhood: '🏘️ Local Area',
+  nature:       '🌲 Nature',
+  waterfront:   '🌊 Waterfront',
+  anywhere:     '🗺️ Anywhere',
+};
+
+export const FOOD_LABELS: Record<string, string> = {
+  no_preference: '🍽️ No Preference',
+  vegetarian:    '🥗 Vegetarian',
+  vegan:         '🌱 Vegan',
+  seafood:       '🐟 Seafood',
+  street_food:   '🌮 Street Food',
+  fine_dining:   '🥂 Fine Dining',
+  no_food:       '🚫 No Food',
+};
+
+export const SPONTANEITY_LABELS: Record<string, string> = {
+  full_plan:    '📋 Fully Planned',
+  loose_plan:   '🗒️ Loose Plan',
+  go_with_flow: '🌊 Go with the Flow',
+  surprise_me:  '🎁 Surprise Me!',
+};
+
 /**
  * Escapes unsafe HTML characters to prevent XSS in email clients.
  */
@@ -73,7 +107,19 @@ export function generateResponseEmailHtml(data: ResponseEmailData): string {
   const safeDateType = escapeHtml(DATE_TYPE_LABELS[data.dateType] || data.dateType || 'Not specified');
   const safeDay = escapeHtml(DAY_LABELS[data.preferredDay] || data.preferredDay || 'Not specified');
   const safeTime = escapeHtml(TIME_LABELS[data.preferredTime] || data.preferredTime || 'Not specified');
-  const safeVibe = escapeHtml(VIBE_LABELS[data.dateVibe] || data.dateVibe || 'Not specified');
+  const safeVibe = data.dateVibe ? escapeHtml(VIBE_LABELS[data.dateVibe] || data.dateVibe) : null;
+  const safeActivity = data.activityPreference
+    ? escapeHtml(ACTIVITY_LABELS[data.activityPreference] || data.activityPreference)
+    : null;
+  const safeLocation = data.locationPreference
+    ? escapeHtml(LOCATION_LABELS[data.locationPreference] || data.locationPreference)
+    : null;
+  const safeFood = data.foodPreference
+    ? escapeHtml(FOOD_LABELS[data.foodPreference] || data.foodPreference)
+    : null;
+  const safeSpontaneity = data.spontaneity
+    ? escapeHtml(SPONTANEITY_LABELS[data.spontaneity] || data.spontaneity)
+    : null;
   const safeUrl = escapeHtml(data.invitationUrl);
 
   const hasMessage = Boolean(data.message && data.message.trim().length > 0);
@@ -186,6 +232,28 @@ export function generateResponseEmailHtml(data: ResponseEmailData): string {
                               </td>
                             </tr>
 
+                            ${safeActivity ? `
+                            <!-- Activity -->
+                            <tr>
+                              <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
+                                Activity
+                              </td>
+                              <td style="padding: 8px 0; font-size: 15px; font-weight: 500; color: #2D3142; border-top: 1px solid #EFEAE3;">
+                                ${safeActivity}
+                              </td>
+                            </tr>` : ''}
+
+                            ${safeLocation ? `
+                            <!-- Setting -->
+                            <tr>
+                              <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
+                                Setting
+                              </td>
+                              <td style="padding: 8px 0; font-size: 15px; font-weight: 500; color: #2D3142; border-top: 1px solid #EFEAE3;">
+                                ${safeLocation}
+                              </td>
+                            </tr>` : ''}
+
                             <!-- Preferred Day -->
                             <tr>
                               <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
@@ -206,7 +274,30 @@ export function generateResponseEmailHtml(data: ResponseEmailData): string {
                               </td>
                             </tr>
 
-                            <!-- Vibe -->
+                            ${safeFood ? `
+                            <!-- Food -->
+                            <tr>
+                              <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
+                                Food
+                              </td>
+                              <td style="padding: 8px 0; font-size: 15px; font-weight: 500; color: #2D3142; border-top: 1px solid #EFEAE3;">
+                                ${safeFood}
+                              </td>
+                            </tr>` : ''}
+
+                            ${safeSpontaneity ? `
+                            <!-- Plan Style -->
+                            <tr>
+                              <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
+                                Plan Style
+                              </td>
+                              <td style="padding: 8px 0; font-size: 15px; font-weight: 500; color: #2D3142; border-top: 1px solid #EFEAE3;">
+                                ${safeSpontaneity}
+                              </td>
+                            </tr>` : ''}
+
+                            ${safeVibe ? `
+                            <!-- Vibe (legacy) -->
                             <tr>
                               <td class="detail-label" style="padding: 8px 0; font-size: 13px; font-weight: 600; color: #8D99AE; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #EFEAE3;">
                                 Vibe
@@ -214,7 +305,7 @@ export function generateResponseEmailHtml(data: ResponseEmailData): string {
                               <td style="padding: 8px 0; font-size: 15px; font-weight: 500; color: #2D3142; border-top: 1px solid #EFEAE3;">
                                 ${safeVibe}
                               </td>
-                            </tr>
+                            </tr>` : ''}
 
                             <!-- Message (if provided) -->
                             ${hasMessage ? `
@@ -292,10 +383,30 @@ export function generateResponseEmailText(data: ResponseEmailData): string {
     '',
     `Recipient: ${recipientName}`,
     `Date type: ${dateType}`,
-    `Preferred day: ${preferredDay}`,
-    `Preferred time: ${preferredTime}`,
-    `Vibe: ${dateVibe}`,
   ];
+
+  // Phase 8 fields (optional)
+  if (data.activityPreference) {
+    lines.push(`Activity: ${ACTIVITY_LABELS[data.activityPreference] || data.activityPreference}`);
+  }
+  if (data.locationPreference) {
+    lines.push(`Setting: ${LOCATION_LABELS[data.locationPreference] || data.locationPreference}`);
+  }
+
+  lines.push(`Preferred day: ${preferredDay}`);
+  lines.push(`Preferred time: ${preferredTime}`);
+
+  if (data.foodPreference) {
+    lines.push(`Food: ${FOOD_LABELS[data.foodPreference] || data.foodPreference}`);
+  }
+  if (data.spontaneity) {
+    lines.push(`Plan style: ${SPONTANEITY_LABELS[data.spontaneity] || data.spontaneity}`);
+  }
+
+  // Legacy date_vibe (only if set)
+  if (data.dateVibe) {
+    lines.push(`Vibe: ${dateVibe}`);
+  }
 
   if (message) {
     lines.push(`Message: "${message}"`);

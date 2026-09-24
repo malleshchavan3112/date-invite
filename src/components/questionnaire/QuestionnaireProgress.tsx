@@ -11,12 +11,15 @@ interface QuestionnaireProgressProps {
 }
 
 const STEP_CHAPTERS: Record<number, { title: string; subtitle: string; icon: string }> = {
-  1: { title: 'THE FUN BEGINS', subtitle: 'Who is this for?', icon: '🏷️' },
-  2: { title: 'THE PLAN', subtitle: 'What are we doing?', icon: '🍽️' },
-  3: { title: 'THE DAY', subtitle: 'Which day feels right?', icon: '📅' },
-  4: { title: 'THE TIME', subtitle: 'What time suits best?', icon: '⏰' },
-  5: { title: 'THE VIBE', subtitle: 'What mood are we going for?', icon: '💫' },
-  6: { title: 'ALMOST THERE', subtitle: 'A quick little note?', icon: '💌' },
+  1: { title: 'THE FUN BEGINS', subtitle: 'Who is this for?',               icon: '🏷️' },
+  2: { title: 'THE DATE',       subtitle: 'What kind of date?',              icon: '🍽️' },
+  3: { title: 'THE VIBE',       subtitle: 'What activity?',                  icon: '🌿' },
+  4: { title: 'THE SETTING',    subtitle: 'Where do you like to be?',        icon: '🗺️' },
+  5: { title: 'THE DAY',        subtitle: 'Which day feels right?',          icon: '📅' },
+  6: { title: 'THE TIME',       subtitle: 'What time suits best?',           icon: '⏰' },
+  7: { title: 'THE FOOD',       subtitle: 'Any dietary preferences?',        icon: '🍽️' },
+  8: { title: 'THE PLAN',       subtitle: 'How spontaneous?',                icon: '🎁' },
+  9: { title: 'ALMOST THERE',   subtitle: 'A quick little note?',            icon: '💌' },
 };
 
 /**
@@ -29,7 +32,7 @@ const STEP_CHAPTERS: Record<number, { title: string; subtitle: string; icon: str
  */
 export default function QuestionnaireProgress({
   currentStep,
-  totalSteps = 6,
+  totalSteps = 9,
   onBack,
   backLabel = 'Back',
   isEditingFromReview = false,
@@ -76,7 +79,7 @@ export default function QuestionnaireProgress({
             {chapter.icon}
           </span>
           <span className="text-[11px] font-sans font-bold tracking-wider text-primary uppercase">
-            0{currentStep}
+            {currentStep < 10 ? `0${currentStep}` : currentStep}
           </span>
           <span className="text-muted/40 text-[10px]" aria-hidden="true">/</span>
           <span className="text-[11px] font-sans font-medium text-muted-foreground tracking-wide">

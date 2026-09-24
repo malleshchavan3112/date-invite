@@ -17,6 +17,10 @@ import type {
   PreferredDay,
   PreferredTime,
   DateVibe,
+  ActivityPreference,
+  LocationPreference,
+  FoodPreference,
+  SpontaneityLevel,
   SubmitResponseInput,
   SubmitResponseResult,
 } from '@/types';
@@ -36,7 +40,7 @@ export async function getResponseByInvitationId(
     const supabase = getSupabaseServerClient();
     const { data, error } = await supabase
       .from('responses')
-      .select('id, invitation_id, answer, recipient_name, date_type, preferred_day, preferred_time, date_vibe, message, created_at, submitted_at')
+      .select('id, invitation_id, answer, recipient_name, date_type, preferred_day, preferred_time, date_vibe, message, activity_preference, location_preference, food_preference, spontaneity, created_at, submitted_at')
       .eq('invitation_id', invitationId)
       .maybeSingle();
 
@@ -56,6 +60,11 @@ export async function getResponseByInvitationId(
         preferred_time: data.preferred_time as PreferredTime | null,
         date_vibe: data.date_vibe as DateVibe | null,
         message: data.message,
+        // Phase 8
+        activity_preference: data.activity_preference as ActivityPreference | null,
+        location_preference: data.location_preference as LocationPreference | null,
+        food_preference: data.food_preference as FoodPreference | null,
+        spontaneity: data.spontaneity as SpontaneityLevel | null,
         created_at: data.created_at,
         submitted_at: data.submitted_at || data.created_at,
       };
@@ -176,8 +185,13 @@ export async function submitResponse(
         preferred_time: input.preferred_time || null,
         date_vibe: input.date_vibe || null,
         message: input.message?.trim() || null,
+        // Phase 8
+        activity_preference: input.activity_preference || null,
+        location_preference: input.location_preference || null,
+        food_preference: input.food_preference || null,
+        spontaneity: input.spontaneity || null,
       })
-      .select('id, invitation_id, answer, recipient_name, date_type, preferred_day, preferred_time, date_vibe, message, created_at, submitted_at')
+      .select('id, invitation_id, answer, recipient_name, date_type, preferred_day, preferred_time, date_vibe, message, activity_preference, location_preference, food_preference, spontaneity, created_at, submitted_at')
       .single();
 
     if (error) {
@@ -216,6 +230,11 @@ export async function submitResponse(
       preferred_time: data.preferred_time as PreferredTime | null,
       date_vibe: data.date_vibe as DateVibe | null,
       message: data.message,
+      // Phase 8
+      activity_preference: data.activity_preference as ActivityPreference | null,
+      location_preference: data.location_preference as LocationPreference | null,
+      food_preference: data.food_preference as FoodPreference | null,
+      spontaneity: data.spontaneity as SpontaneityLevel | null,
       created_at: data.created_at,
       submitted_at: data.submitted_at || data.created_at,
     };
@@ -235,6 +254,11 @@ export async function submitResponse(
         preferredTime: response.preferred_time,
         dateVibe: response.date_vibe,
         message: response.message,
+        // Phase 8
+        activityPreference: response.activity_preference,
+        locationPreference: response.location_preference,
+        foodPreference: response.food_preference,
+        spontaneity: response.spontaneity,
       });
       emailSent = emailResult.success;
     } catch (emailErr) {

@@ -7,31 +7,31 @@ import QuestionnaireProgress from './QuestionnaireProgress';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
 import DateInviteCard from '@/components/ui/DateInviteCard';
 
-interface PreferredDayStepProps {
+interface LocationPreferenceStepProps {
   value: string;
-  onContinue: (day: string) => void;
+  onContinue: (location: string) => void;
   onBack: () => void;
   isEditingFromReview?: boolean;
 }
 
-const DAYS = [
-  { id: 'weekday', label: 'Weekday', emoji: '🗓️', description: 'Monday – Thursday' },
-  { id: 'friday', label: 'Friday', emoji: '🥂', description: 'Kick off the weekend' },
-  { id: 'saturday', label: 'Saturday', emoji: '🌅', description: 'Classic date night' },
-  { id: 'sunday', label: 'Sunday', emoji: '☕', description: 'Relaxed & easygoing' },
-  { id: 'any', label: 'Any day', emoji: '💫', description: 'Flexible with anything' },
+const LOCATIONS = [
+  { id: 'city_center',   label: 'City Center',    emoji: '🏙️', description: 'Busy streets & energy' },
+  { id: 'neighborhood',  label: 'Local Area',     emoji: '🏘️', description: 'Familiar & close by' },
+  { id: 'nature',        label: 'Nature',         emoji: '🌲', description: 'Parks, trails & fresh air' },
+  { id: 'waterfront',    label: 'Waterfront',     emoji: '🌊', description: 'Lake, river or seaside' },
+  { id: 'anywhere',      label: 'Anywhere Works', emoji: '🗺️', description: 'No preference at all' },
 ] as const;
 
 /**
- * P08 — Preferred Day
- * Single-selection choice cards for preferred date day.
+ * P09 — Location Preference (Phase 8)
+ * Picks a general area type — NO exact addresses, home locations, or GPS.
  */
-export default function PreferredDayStep({
+export default function LocationPreferenceStep({
   value,
   onContinue,
   onBack,
   isEditingFromReview = false,
-}: PreferredDayStepProps) {
+}: LocationPreferenceStepProps) {
   const [selected, setSelected] = useState<string>(value);
 
   const handleContinue = () => {
@@ -49,7 +49,7 @@ export default function PreferredDayStep({
         <DateInviteCard>
           {/* Header progress & back */}
           <QuestionnaireProgress
-            currentStep={5}
+            currentStep={4}
             totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
@@ -58,24 +58,24 @@ export default function PreferredDayStep({
           {/* Question & Supporting Copy */}
           <div className="mb-6 text-left">
             <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-              When are you{' '}
-              <span className="font-serif italic text-primary">usually free?</span>&nbsp;🗓️
+              What kind of{' '}
+              <span className="font-serif italic text-primary">setting sounds good?</span>&nbsp;🗺️
             </h1>
             <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-              Pick whatever day works best for your schedule.
+              Just a general feel — no exact location needed.
             </p>
           </div>
 
-          {/* Choice Cards List */}
+          {/* Choice Cards Grid */}
           <div
-            className="space-y-2.5 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-6"
             role="radiogroup"
-            aria-label="Preferred day options"
+            aria-label="Location preference options"
           >
-            {DAYS.map((item) => (
+            {LOCATIONS.map((item) => (
               <ChoiceCard
                 key={item.id}
-                id={`preferred-day-${item.id}`}
+                id={`location-${item.id}`}
                 label={item.label}
                 emoji={item.emoji}
                 description={item.description}
@@ -91,7 +91,7 @@ export default function PreferredDayStep({
             onClick={handleContinue}
             disabled={!selected}
             fullWidth
-            id="preferred-day-continue-btn"
+            id="location-continue-btn"
             className="py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover"
           >
             {isEditingFromReview ? 'Save & Return to Review' : 'Continue'}

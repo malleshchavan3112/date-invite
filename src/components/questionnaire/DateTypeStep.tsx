@@ -51,7 +51,7 @@ export default function DateTypeStep({
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={2}
-            totalSteps={6}
+            totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
           />

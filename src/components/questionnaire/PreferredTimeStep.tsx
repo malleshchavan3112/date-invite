@@ -48,8 +48,8 @@ export default function PreferredTimeStep({
         <DateInviteCard>
           {/* Header progress & back */}
           <QuestionnaireProgress
-            currentStep={4}
-            totalSteps={6}
+            currentStep={6}
+            totalSteps={9}
             onBack={onBack}
             isEditingFromReview={isEditingFromReview}
           />

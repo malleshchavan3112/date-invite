@@ -61,6 +61,38 @@ export type DateVibe =
   | 'chill'
   | 'spontaneous';
 
+// ─── Phase 8: New preference types ─────────────────────────────────────────
+
+export type ActivityPreference =
+  | 'outdoor'
+  | 'indoor'
+  | 'active'
+  | 'relaxed'
+  | 'cultural'
+  | 'surprise_me';
+
+export type LocationPreference =
+  | 'city_center'
+  | 'neighborhood'
+  | 'nature'
+  | 'waterfront'
+  | 'anywhere';
+
+export type FoodPreference =
+  | 'no_preference'
+  | 'vegetarian'
+  | 'vegan'
+  | 'seafood'
+  | 'street_food'
+  | 'fine_dining'
+  | 'no_food';
+
+export type SpontaneityLevel =
+  | 'full_plan'
+  | 'loose_plan'
+  | 'go_with_flow'
+  | 'surprise_me';
+
 export interface QuestionnaireData {
   name: string;
   dateType: DateType | null;
@@ -68,6 +100,11 @@ export interface QuestionnaireData {
   preferredTime: PreferredTime | null;
   dateVibe: DateVibe | null;
   message: string;
+  // Phase 8
+  activityPreference: ActivityPreference | null;
+  locationPreference: LocationPreference | null;
+  foodPreference: FoodPreference | null;
+  spontaneity: SpontaneityLevel | null;
 }
 
 export const EMPTY_QUESTIONNAIRE: QuestionnaireData = {
@@ -77,10 +114,15 @@ export const EMPTY_QUESTIONNAIRE: QuestionnaireData = {
   preferredTime: null,
   dateVibe: null,
   message: '',
+  // Phase 8
+  activityPreference: null,
+  locationPreference: null,
+  foodPreference: null,
+  spontaneity: null,
 };
 
 /**
- * Phase 3: Flattened questionnaire answers format
+ * Phase 3+8: Flattened questionnaire answers format (client → server)
  */
 export interface QuestionnaireAnswers {
   recipient_name: string;
@@ -89,6 +131,11 @@ export interface QuestionnaireAnswers {
   preferred_time: string;
   date_vibe: string;
   message: string;
+  // Phase 8
+  activity_preference: string;
+  location_preference: string;
+  food_preference: string;
+  spontaneity: string;
 }
 
 export const INITIAL_QUESTIONNAIRE_ANSWERS: QuestionnaireAnswers = {
@@ -98,6 +145,11 @@ export const INITIAL_QUESTIONNAIRE_ANSWERS: QuestionnaireAnswers = {
   preferred_time: '',
   date_vibe: '',
   message: '',
+  // Phase 8
+  activity_preference: '',
+  location_preference: '',
+  food_preference: '',
+  spontaneity: '',
 };
 
 // ─── Response ─────────────────────────────────────────────────────────────
@@ -114,6 +166,11 @@ export interface Response {
   preferred_time: PreferredTime | null;
   date_vibe: DateVibe | null;
   message: string | null;
+  // Phase 8
+  activity_preference: ActivityPreference | null;
+  location_preference: LocationPreference | null;
+  food_preference: FoodPreference | null;
+  spontaneity: SpontaneityLevel | null;
   created_at: string;
   submitted_at: string;
 }
@@ -134,6 +191,11 @@ export interface SubmitResponseInput {
   preferred_time: string;
   date_vibe: string;
   message?: string;
+  // Phase 8
+  activity_preference?: string;
+  location_preference?: string;
+  food_preference?: string;
+  spontaneity?: string;
   forceError?: boolean;
 }
 
@@ -159,6 +221,11 @@ export interface SendInvitationResponsePayload {
   preferredTime: PreferredTime | null;
   dateVibe: DateVibe | null;
   message?: string | null;
+  // Phase 8
+  activityPreference?: ActivityPreference | null;
+  locationPreference?: LocationPreference | null;
+  foodPreference?: FoodPreference | null;
+  spontaneity?: SpontaneityLevel | null;
 }
 
 export interface SendEmailResult {
@@ -176,6 +243,11 @@ export interface ResponseEmailData {
   dateVibe: string;
   message?: string | null;
   invitationUrl: string;
+  // Phase 8
+  activityPreference?: string | null;
+  locationPreference?: string | null;
+  foodPreference?: string | null;
+  spontaneity?: string | null;
 }
 
 // ─── App State ───────────────────────────────────────────────────────────
@@ -185,22 +257,26 @@ export interface ResponseEmailData {
  * Aligned with screen IDs P01–P16 (D007).
  */
 export type InvitationStep =
-  | 'loading'       // P01
-  | 'landing'       // P02
-  | 'question'      // P03
-  | 'playful-no'    // P04
-  | 'no-completion' // P05
-  | 'name'          // P06
-  | 'date-type'     // P07
-  | 'preferred-day' // P08
-  | 'preferred-time'// P09
-  | 'date-vibe'     // P10
-  | 'message'       // P11
-  | 'review'        // P12
-  | 'submitting'    // P13
-  | 'success'       // P14
-  | 'invalid'       // P15
-  | 'error';        // P16
+  | 'loading'           // P01
+  | 'landing'           // P02
+  | 'question'          // P03
+  | 'playful-no'        // P04
+  | 'no-completion'     // P05
+  | 'name'              // P06
+  | 'date-type'         // P07
+  | 'activity'          // P08 NEW
+  | 'location'          // P09 NEW
+  | 'preferred-day'     // P10
+  | 'preferred-time'    // P11
+  | 'food'              // P12 NEW
+  | 'spontaneity'       // P13 NEW
+  | 'date-vibe'         // P14 (kept)
+  | 'message'           // P15
+  | 'review'            // P16
+  | 'submitting'        // P17
+  | 'success'           // P18
+  | 'invalid'           // P19
+  | 'error';            // P20
 
 export interface InvitationState {
   step: InvitationStep;

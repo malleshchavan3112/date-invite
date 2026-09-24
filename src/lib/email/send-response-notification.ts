@@ -87,6 +87,11 @@ export async function sendInvitationResponseEmail(
     dateVibe: payload.dateVibe || 'Not specified',
     message: payload.message?.trim() || null,
     invitationUrl,
+    // Phase 8
+    activityPreference: payload.activityPreference || null,
+    locationPreference: payload.locationPreference || null,
+    foodPreference: payload.foodPreference || null,
+    spontaneity: payload.spontaneity || null,
   };
 
   const html = generateResponseEmailHtml(emailData);
