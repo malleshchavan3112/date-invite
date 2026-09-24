@@ -35,8 +35,7 @@ export function getResendClient(): Resend | null {
 
 /**
  * Resolves the configured sender email address.
- * Defaults to DateInvite with onboarding@resend.dev for development,
- * or the custom verified sender set in RESEND_FROM_EMAIL.
+ * Uses RESEND_FROM_EMAIL if set, or defaults to the verified production sender on dateinvite.me.
  */
 export function getSenderEmail(): string {
   const configuredSender = process.env.RESEND_FROM_EMAIL?.trim();
@@ -44,8 +43,8 @@ export function getSenderEmail(): string {
     return configuredSender;
   }
 
-  // Resend default verified sender for testing
-  return 'DateInvite <onboarding@resend.dev>';
+  // Verified production sender for dateinvite.me
+  return 'DateInvite <notifications@dateinvite.me>';
 }
 
 /**

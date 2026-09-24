@@ -81,3 +81,8 @@ To prevent accidental duplicate notifications across network retries, browser re
 ## D023 — Asymmetric Failure Isolation: Persistence over Notification (2026-09-24)
 If Supabase response persistence fails, email transmission is never attempted and the error is returned to the recipient with preserved inputs for retry. Conversely, if Supabase succeeds but Resend delivery fails (e.g. rate limit, provider outage, missing API key), the persisted database response is never rolled back or deleted. The operation returns `{ success: true, emailSent: false }`, allowing the recipient to reach success P14 without technical error exposure while server-side logs capture delivery failure.
 
+## D024 — Production Security Headers, Canonical Sender & Anti-Crawling Isolation (2026-09-24)
+1. **HTTP Security Headers**: `next.config.js` injects standard, safe production headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`) and disables `X-Powered-By`. Aggressive CSP is deliberately omitted to prevent breaking Framer Motion animation engines and Google Fonts.
+2. **Canonical Production Sender**: Resend sender resolution prioritizes `DateInvite <notifications@dateinvite.me>` aligned with the verified `dateinvite.me` custom domain.
+3. **Anti-Crawling Isolation**: Recipient routes `/invite/[slug]` enforce `robots: { index: false, follow: false, nocache: true }` to guarantee private unlisted invitation links are never scraped or indexed by search engines.
+

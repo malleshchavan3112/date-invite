@@ -1,5 +1,26 @@
 # Changelog
 
+## [Phase 7.0] — 2026-09-24
+
+### Added
+- **Production Security Headers (`next.config.js`)**:
+  - Injected `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy: camera=(), microphone=(), geolocation=()`.
+  - Disabled `poweredByHeader` (`X-Powered-By: Next.js` removal).
+- **Anti-Crawling & Privacy Isolation**:
+  - Configured explicit `robots: { index: false, follow: false, nocache: true }` in `src/app/invite/[slug]/layout.tsx` to prevent search engine indexing of private invitation links.
+  - Added `metadataBase: new URL('https://dateinvite.me')` and rich Open Graph metadata in `src/app/layout.tsx`.
+- **Production Resend Sender Resolution**:
+  - Updated default sender to `DateInvite <notifications@dateinvite.me>` aligned with the verified domain on Resend.
+  - Updated `.env.example` documentation for Vercel production deployment.
+- **Verification & QA**:
+  - Confirmed live HTTPS endpoint `https://dateinvite.me` and apex redirect to `https://www.dateinvite.me/`.
+  - Executed live Resend + Testmail email verification suite with 100% green assertions.
+  - Executed Supabase integration suite (`scripts/test-supabase.ts`) with 100% green assertions.
+  - Executed end-to-end simulation suite (`scripts/test-e2e-simulation.ts`) with 100% green assertions.
+  - Validated responsive layout, accessibility (focus states, ARIA, reduced-motion), and keyboard navigation across viewports.
+
+---
+
 ## [Phase 6.0] — 2026-09-24
 
 ### Added

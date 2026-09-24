@@ -21,16 +21,15 @@ const inter = Inter({
 // ─── Metadata ─────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'You have a special invitation 💌',
-  description: 'Someone is asking you on a date. Open to find out who.',
-  keywords: ['invitation', 'date', 'special'],
-  robots: {
-    index: false,   // Private invitations — don't index
-    follow: false,
-  },
+  metadataBase: new URL('https://dateinvite.me'),
+  title: 'DateInvite 💌 • A Playful Invitation Experience',
+  description: 'Create a private, interactive date invitation and send it to someone special.',
+  keywords: ['date invite', 'invitation', 'date ideas', 'special invitation'],
   openGraph: {
-    title: 'You have a special invitation 💌',
-    description: 'Someone is asking you on a date. Open to find out who.',
+    title: 'DateInvite 💌 • A Playful Invitation Experience',
+    description: 'Create a private, interactive date invitation and send it to someone special.',
+    url: 'https://dateinvite.me',
+    siteName: 'DateInvite',
     type: 'website',
   },
 };

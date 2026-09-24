@@ -11,6 +11,16 @@ export async function generateMetadata(
   return {
     title: 'You have a special invitation 💌',
     description: 'Open to find out who is asking you on a date.',
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    },
   };
 }
 
