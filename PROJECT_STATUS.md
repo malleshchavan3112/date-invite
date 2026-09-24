@@ -1,7 +1,7 @@
 # Project Status
 
 ## Current Phase
-PHASE 4 COMPLETE — Submission & Final Recipient States (P13–P16 Built & Verified) • Next: Phase 5 (Supabase Database Integration)
+PHASE 5 COMPLETE — Supabase Database + Invitation / Response Persistence (Built, Linked & Verified) • Next: Phase 6 (Resend Email Integration)
 
 ---
 
@@ -13,6 +13,42 @@ The product architecture has transitioned to a **two-sided invitation model**:
 ---
 
 ## Completed Milestones
+
+### Phase 5 — Supabase Database + Invitation / Response Persistence ✅
+- [x] **Supabase Project Linked & Migrated**: Connected to live Supabase project `dateinvite` (`rscybfaxhpesbpvmjyhk` on `ap-south-1`).
+- [x] **Database Schema Applied (`supabase/migrations/20260924063017_phase5_invitations_and_responses.sql`)**:
+  - `invitations` table: `id` (uuid pk), `slug` (unique text), `creator_name`, `creator_email`, `title`, `intro_text`, `active`, `created_at`, `updated_at`. Enforced format and non-empty checks.
+  - `responses` table: `id` (uuid pk), `invitation_id` (foreign key to `invitations(id)` ON DELETE CASCADE), `answer` (`'yes' | 'no'`), `recipient_name`, `date_type`, `preferred_day`, `preferred_time`, `date_vibe`, `message`, `created_at`, `submitted_at`, `updated_at`.
+  - Duplicate response protection: `UNIQUE (invitation_id)` constraint on `responses` guarantees only 1 response per invitation at the DB level.
+  - Indexes: `idx_invitations_slug` (unique), `idx_invitations_active`, `idx_responses_invitation_id`.
+  - Row-Level Security (RLS) enabled on both tables.
+  - RLS policies configured: public view on active invitations, insert on responses for active invitations, default deny on direct public read of responses.
+  - `public_invitations` view created with `creator_email` strictly excluded.
+- [x] **Supabase Client Layer (`src/lib/supabase/`)**:
+  - `client.ts`: Browser client using public URL & anon key.
+  - `server.ts`: Server client factory using service role key (strictly server-side, never exposed to client).
+- [x] **Supabase Invitation Repository (`src/lib/invitation-repository.ts`)**:
+  - `createInvitation`: Generates collision-resistant unpredictable slugs, inserts into Supabase, handles slug collision retry loop.
+  - `getPublicInvitationBySlug`: Privacy Firewall strictly selects only safe public columns (`creator_email` is NEVER queried or returned).
+  - `getInvitationBySlug` & `getInvitationById`: Server-side only lookups retaining `creator_email` for notifications.
+- [x] **Supabase Response Repository (`src/lib/response-repository.ts`)**:
+  - `submitResponse`: Validates inputs, verifies invitation exists and is active, verifies no duplicate response exists, inserts into Supabase `responses`, handles 23505 unique violation code cleanly.
+  - `hasResponseForInvitation`: Checks if an invitation already has a response.
+  - `getResponseByInvitationId`: Retrieves completed response by invitation ID.
+- [x] **Security & Environment**:
+  - `.env.local` configured with Supabase credentials and verified git-ignored.
+  - `.env.example` created for clean onboarding.
+- [x] **Comprehensive Verification**:
+  - Automated integration test suite (`scripts/test-supabase.ts`) executed against live Supabase database with all 7 test cases passing:
+    1. Real invitation creation in Supabase
+    2. Privacy Firewall verification (creator_email excluded)
+    3. Server-side invitation retrieval with email
+    4. Questionnaire response submission with foreign key
+    5. Response persistence and retrieval
+    6. Duplicate submission protection (`ALREADY_SUBMITTED`)
+    7. Non-existent invitation rejection (`INVITATION_NOT_FOUND`)
+  - `npx tsc --noEmit`: 0 errors.
+  - `npm run build`: Production build completed with 0 errors across all routes.
 
 ### Phase 4 — Submission & Final Recipient States (P13–P16) ✅
 - [x] **P13 Submitting State**: Dedicated submission animation with floating/gliding envelope, pulsing soft glow rings, indeterminate shimmer progress bar, and screen-reader status announcements (`aria-busy`, `aria-live="polite"`). Implemented complete lock preventing double-submissions and duplicate network calls.

@@ -63,3 +63,12 @@ Invitation slugs must be generated server-side using cryptographically secure ra
 - Creator share hub: `/create/success` (or inline transition)
 - Creator status: `/invite/[slug]/status`
 - Recipient entry: `/invite/[slug]`
+
+## D019 — Supabase Server Client & Privacy Isolation (2026-09-24)
+Server actions and repositories utilize a dedicated server-side Supabase client (`src/lib/supabase/server.ts`) initialized with `SUPABASE_SERVICE_ROLE_KEY`. This provides complete backend authority to perform business validations and slug collision retries while enforcing the Privacy Firewall: `getPublicInvitationBySlug` strictly omits `creator_email` at the SQL `SELECT` level. The service role key is strictly kept in server environment variables and never exposed to the client.
+
+## D020 — Double-Layered Duplicate Response Protection (2026-09-24)
+Duplicate responses to the same invitation are guarded at two independent layers:
+1. Application layer: `hasResponseForInvitation(invitationId)` check before insert returns early with `ALREADY_SUBMITTED`.
+2. Database layer: PostgreSQL `UNIQUE (invitation_id)` constraint on the `responses` table throws error code `23505` on race conditions, which the repository catches and gracefully surfaces as `ALREADY_SUBMITTED`.
+

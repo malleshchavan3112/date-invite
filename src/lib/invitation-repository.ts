@@ -1,35 +1,21 @@
 /**
- * DateInvite — Invitation Repository (Mock Layer)
+ * DateInvite — Invitation Repository (Supabase Real Persistence Layer)
  * 
- * Provides an isolated data layer for creating and resolving invitations.
- * In Phase 5, this interface will be backed by Supabase.
+ * Backed by Supabase PostgreSQL database.
  * 
- * D014: Invitations table schema
- * D016: Privacy Firewall (creator_email NEVER in PublicInvitation)
- * D017: Cryptographically unpredictable slugs
+ * Architectural Guarantees:
+ * - D014: Invitations table schema in Supabase
+ * - D016: Privacy Firewall (creator_email is NEVER fetched or exposed in PublicInvitation)
+ * - D017: Cryptographically unpredictable slugs (collision resistant)
  */
 
 import type { Invitation, PublicInvitation, CreateInvitationInput } from '@/types';
+import { getSupabaseServerClient } from './supabase/server';
 import { DEMO_INVITATION } from './mock';
-
-// Global singleton map to preserve in-memory records across dev reloads & requests
-declare global {
-  // eslint-disable-next-line no-var
-  var __dateInviteStore: Map<string, Invitation> | undefined;
-}
-
-const store: Map<string, Invitation> =
-  globalThis.__dateInviteStore ||
-  (globalThis.__dateInviteStore = new Map<string, Invitation>());
-
-// Ensure DEMO_INVITATION is always available for test route /invite/demo-date
-if (!store.has(DEMO_INVITATION.slug)) {
-  store.set(DEMO_INVITATION.slug, DEMO_INVITATION);
-}
 
 /**
  * Generate a cryptographically unpredictable, URL-safe slug.
- * Example outputs: 'a8K29x', 'm4P7qR', '7Xp9Rw'
+ * Example outputs: 'a8K29xR', 'm4P7qRt', '7Xp9RwK'
  * 
  * Uses unambiguous alphanumeric characters (excluding confusing 0/O, 1/l/I).
  */
@@ -62,14 +48,14 @@ export function toPublicInvitation(invitation: Invitation): PublicInvitation {
 }
 
 /**
- * Create a new invitation in the repository.
+ * Create a new invitation in the Supabase database.
  * Generates an unpredictable slug, personalizes default intro text, and stores the record.
  */
 export async function createInvitation(input: CreateInvitationInput): Promise<Invitation> {
-  const trimmedName = input.creator_name.trim();
-  const trimmedEmail = input.creator_email.trim().toLowerCase();
+  const trimmedName = input.creator_name?.trim();
+  const trimmedEmail = input.creator_email?.trim().toLowerCase();
 
-  if (!trimmedName) {
+  if (!trimmedName || trimmedName.length < 1) {
     throw new Error('Creator name is required');
   }
 
@@ -78,70 +64,92 @@ export async function createInvitation(input: CreateInvitationInput): Promise<In
     throw new Error('Valid creator email is required');
   }
 
-  // Generate a unique collision-resistant slug
-  let slug = generateUnpredictableSlug(7);
-  while (store.has(slug)) {
-    slug = generateUnpredictableSlug(7);
-  }
+  const supabase = getSupabaseServerClient();
 
-  const id =
-    typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID()
-      : `inv-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  // Retry loop for collision resistance (max 5 attempts)
+  const maxAttempts = 5;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const slug = generateUnpredictableSlug(7);
 
-  const invitation: Invitation = {
-    id,
-    slug,
-    creator_name: trimmedName,
-    creator_email: trimmedEmail,
-    title: input.title || 'Would you go on a date with me?',
-    intro_text:
-      input.intro_text ||
-      `${trimmedName} thinks you are wonderful and wants to invite you somewhere special.`,
-    active: true,
-    created_at: new Date().toISOString(),
-  };
+    const title = input.title?.trim() || 'Would you go on a date with me?';
+    const introText =
+      input.intro_text?.trim() ||
+      `${trimmedName} thinks you are wonderful and wants to invite you somewhere special.`;
 
-  store.set(slug, invitation);
+    const { data, error } = await supabase
+      .from('invitations')
+      .insert({
+        slug,
+        creator_name: trimmedName,
+        creator_email: trimmedEmail,
+        title,
+        intro_text: introText,
+        active: true,
+      })
+      .select('id, slug, creator_name, creator_email, title, intro_text, active, created_at')
+      .single();
 
-  // Sync to browser localStorage/sessionStorage if running on the client
-  if (typeof window !== 'undefined') {
-    try {
-      const stored = JSON.parse(localStorage.getItem('dateinvite_invitations') || '{}');
-      stored[slug] = invitation;
-      localStorage.setItem('dateinvite_invitations', JSON.stringify(stored));
-    } catch {
-      // Storage unavailable or disabled; in-memory store remains active
+    if (!error && data) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        creator_name: data.creator_name,
+        creator_email: data.creator_email,
+        title: data.title,
+        intro_text: data.intro_text,
+        active: data.active,
+        created_at: data.created_at,
+      };
     }
+
+    // If error is unique constraint violation on slug (code 23505), loop again
+    if (error && error.code === '23505' && error.message.includes('slug')) {
+      continue;
+    }
+
+    // Other unexpected error
+    throw new Error(error ? error.message : 'Failed to create invitation in database.');
   }
 
-  return invitation;
+  throw new Error('Could not generate a unique invitation link. Please try again.');
 }
 
 /**
  * Retrieve an internal Invitation by slug (server-side only, includes creator_email).
  */
 export async function getInvitationBySlug(slug: string): Promise<Invitation | null> {
-  // Check in-memory store
-  if (store.has(slug)) {
-    return store.get(slug)!;
-  }
+  if (!slug) return null;
 
-  // In browser context, try localStorage fallback
-  if (typeof window !== 'undefined') {
-    try {
-      const stored = JSON.parse(localStorage.getItem('dateinvite_invitations') || '{}');
-      if (stored[slug]) {
-        const item = stored[slug] as Invitation;
-        store.set(slug, item);
-        return item;
-      }
-    } catch {
-      // Storage read failed
+  try {
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase
+      .from('invitations')
+      .select('id, slug, creator_name, creator_email, title, intro_text, active, created_at')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (error) {
+      console.error(`[invitation-repository] Error fetching invitation by slug "${slug}":`, error);
+      return null;
     }
+
+    if (data) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        creator_name: data.creator_name,
+        creator_email: data.creator_email,
+        title: data.title,
+        intro_text: data.intro_text,
+        active: data.active,
+        created_at: data.created_at,
+      };
+    }
+  } catch (err) {
+    console.error(`[invitation-repository] Exception fetching invitation by slug "${slug}":`, err);
   }
 
-  // Development convenience fallback: if slug matches demo or in dev mode with unrecognized slug
+  // Fallback for development demo route
   if (slug === DEMO_INVITATION.slug) {
     return DEMO_INVITATION;
   }
@@ -150,36 +158,41 @@ export async function getInvitationBySlug(slug: string): Promise<Invitation | nu
 }
 
 /**
- * Retrieve an internal Invitation by ID.
+ * Retrieve an internal Invitation by ID (server-side only).
  */
 export async function getInvitationById(id: string): Promise<Invitation | null> {
-  // Check in-memory store
-  let found: Invitation | null = null;
-  store.forEach((invitation) => {
-    if (!found && invitation.id === id) {
-      found = invitation;
-    }
-  });
-  if (found) return found;
+  if (!id) return null;
 
-  // In browser context, try localStorage fallback
-  if (typeof window !== 'undefined') {
-    try {
-      const stored = JSON.parse(localStorage.getItem('dateinvite_invitations') || '{}');
-      const keys = Object.keys(stored);
-      for (let i = 0; i < keys.length; i++) {
-        const item = stored[keys[i]] as Invitation;
-        if (item.id === id) {
-          store.set(item.slug, item);
-          return item;
-        }
-      }
-    } catch {
-      // Storage read failed
+  try {
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase
+      .from('invitations')
+      .select('id, slug, creator_name, creator_email, title, intro_text, active, created_at')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      console.error(`[invitation-repository] Error fetching invitation by id "${id}":`, error);
+      return null;
     }
+
+    if (data) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        creator_name: data.creator_name,
+        creator_email: data.creator_email,
+        title: data.title,
+        intro_text: data.intro_text,
+        active: data.active,
+        created_at: data.created_at,
+      };
+    }
+  } catch (err) {
+    console.error(`[invitation-repository] Exception fetching invitation by id "${id}":`, err);
   }
 
-  // Demo invitation fallback
+  // Fallback for demo ID
   if (DEMO_INVITATION.id === id) {
     return DEMO_INVITATION;
   }
@@ -189,13 +202,47 @@ export async function getInvitationById(id: string): Promise<Invitation | null> 
 
 /**
  * Retrieve a public-facing invitation by slug.
- * Privacy-safe: guaranteed never to contain `creator_email` (D016).
+ * 
+ * Privacy Firewall (D016):
+ * Queries ONLY the non-sensitive public columns (excluding creator_email).
+ * Guaranteed to never expose creator_email to the recipient client.
  */
 export async function getPublicInvitationBySlug(slug: string): Promise<PublicInvitation | null> {
-  const invitation = await getInvitationBySlug(slug);
-  if (!invitation || !invitation.active) {
-    return null;
-  }
-  return toPublicInvitation(invitation);
-}
+  if (!slug) return null;
 
+  try {
+    const supabase = getSupabaseServerClient();
+    // Strictly select only public fields — creator_email is never queried
+    const { data, error } = await supabase
+      .from('invitations')
+      .select('id, slug, creator_name, title, intro_text, active, created_at')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (error) {
+      console.error(`[invitation-repository] Error fetching public invitation for "${slug}":`, error);
+      return null;
+    }
+
+    if (data && data.active) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        creator_name: data.creator_name,
+        title: data.title,
+        intro_text: data.intro_text,
+        active: data.active,
+        created_at: data.created_at,
+      };
+    }
+  } catch (err) {
+    console.error(`[invitation-repository] Exception fetching public invitation for "${slug}":`, err);
+  }
+
+  // Fallback for demo invitation
+  if (slug === DEMO_INVITATION.slug) {
+    return toPublicInvitation(DEMO_INVITATION);
+  }
+
+  return null;
+}

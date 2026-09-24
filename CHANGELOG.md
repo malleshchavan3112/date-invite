@@ -2,6 +2,34 @@
 
 All notable changes to the DateInvite project are documented in this file.
 
+## [Phase 5.0] — 2026-09-24
+
+### Added
+- **Supabase Cloud Database Integration**:
+  - Linked to project `dateinvite` (`rscybfaxhpesbpvmjyhk` on `ap-south-1`).
+  - Migration `20260924063017_phase5_invitations_and_responses.sql` applied.
+  - `invitations` table with UUID primary keys, unique slugs, email/name constraints, and timestamps.
+  - `responses` table with foreign key to `invitations`, unique constraint on `invitation_id` for duplicate submission prevention, and timestamp tracking.
+  - `public_invitations` view implementing defense-in-depth privacy by omitting `creator_email`.
+  - Row Level Security (RLS) enabled on all tables with explicit SELECT and INSERT policies.
+- **Supabase Client Layer (`src/lib/supabase/`)**:
+  - `client.ts`: Browser client initialized with public URL & anon key.
+  - `server.ts`: Server client factory using service role key (bypasses RLS strictly for safe server actions).
+- **Supabase Invitation Repository (`src/lib/invitation-repository.ts`)**:
+  - Replaced in-memory mock store with real Supabase persistence.
+  - `createInvitation`: Generates collision-resistant unpredictable slugs, inserts into Supabase with retry logic.
+  - `getPublicInvitationBySlug`: Implements Privacy Firewall (D016) by querying and returning ONLY public columns (`creator_email` is never retrieved).
+  - `getInvitationBySlug` & `getInvitationById`: Server-side only lookups.
+- **Supabase Response Repository (`src/lib/response-repository.ts`)**:
+  - Replaced in-memory mock store with real Supabase persistence.
+  - `submitResponse`: Validates input, verifies invitation existence and active status, enforces duplicate submission protection, inserts into Supabase, and handles unique constraint violations cleanly.
+  - `hasResponseForInvitation`: Verifies prior submission status.
+  - `getResponseByInvitationId`: Fetches completed response.
+- **Automated Integration Tests (`scripts/test-supabase.ts`)**:
+  - 7 automated tests verifying end-to-end Supabase creation, privacy firewall, response submission, duplicate prevention, and error codes.
+
+---
+
 ## [Phase 4.0] — 2026-09-23
 
 ### Added
