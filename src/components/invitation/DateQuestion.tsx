@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import NoEscapeButton from '@/components/ui/NoEscapeButton';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import DateInviteCard from '@/components/ui/DateInviteCard';
 import type { Invitation, PublicInvitation } from '@/types';
 
 interface DateQuestionProps {
@@ -18,20 +19,23 @@ const CELEBRATION_PARTICLES = [
   '❤️', '✨', '💕', '🌹', '💖', '🥰', '💫', '🎉',
 ];
 
+const DODGE_REACTION_EMOJIS = ['👀', '😳', '🏃‍♂️💨', 'Wait! 🥺', 'Nice try! 😌', 'Hey! 😅'];
+
 /**
  * P03 — Main Date Question (Hero Screen)
  *
- * Funny & Playful Polish:
- * - Cheeky eyebrow: "⚠️ IMPORTANT QUESTION"
- * - Playful supporting copy: "No pressure... okay, maybe a tiny bit. 😌"
- * - Avatar surprise reaction whenever the NO button dodges
- * - Bold confident YES CTA: "Obviously YES 😌"
+ * Visual Highlight of DateInvite:
+ * - Editorial serif typography with italic romantic emphasis
+ * - Ambient soft halo glow behind romantic avatar
+ * - Floating micro-particles (sparkle & heart)
+ * - Cheeky avatar reaction whenever NO dodges
+ * - Bold confident YES CTA with pulse glow
  * - Evasive NO button with progressive cheeky micro-copy
- * - Subtle bottom note: "Choose wisely 👀"
  */
 export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionProps) {
   const [celebrating, setCelebrating] = useState(false);
   const [avatarReaction, setAvatarReaction] = useState(0);
+  const [reactionBubble, setReactionBubble] = useState<string | null>(null);
   const hasActed = useRef(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -51,6 +55,11 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
 
   const handleNoDodge = useCallback(() => {
     setAvatarReaction((prev) => prev + 1);
+    const emoji = DODGE_REACTION_EMOJIS[Math.floor(Math.random() * DODGE_REACTION_EMOJIS.length)];
+    setReactionBubble(emoji);
+    setTimeout(() => {
+      setReactionBubble(null);
+    }, 1200);
   }, []);
 
   return (
@@ -66,156 +75,187 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
       </AnimatePresence>
 
       {/* ── Hero Invitation Card ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 22, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.42, ease: [0.25, 0.1, 0.25, 1] }}
-        className="w-full max-w-sm sm:max-w-md mx-auto bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 relative z-10 text-center"
-      >
-        {/* Eyebrow Pill */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.3 }}
-          className="mb-4 inline-flex items-center gap-1.5 bg-primary-subtle text-primary border border-primary/20 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-          <span>⚠️ Important Question</span>
-        </motion.div>
-
-        {/* ── Refined Avatar / Image Presentation ── */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.88 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.14, duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
-          className="relative mx-auto mb-5 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center"
-        >
-          {/* Ambient soft glow ring behind avatar */}
-          <div
-            className="absolute inset-0 rounded-[1.75rem] bg-gradient-to-tr from-rose-200/50 to-pink-100/40 blur-md -z-10"
-            aria-hidden="true"
-          />
-
-          {/* Avatar Container with idle breathing + cheeky dodge reaction */}
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+        <DateInviteCard glow>
+          {/* Eyebrow Pill */}
           <motion.div
-            key={avatarReaction}
-            animate={
-              prefersReducedMotion
-                ? {}
-                : avatarReaction > 0
-                ? {
-                    y: [0, -8, 0],
-                    rotate: [0, -6, 6, 0],
-                    scale: [1, 1.05, 1],
-                  }
-                : {
-                    y: [0, -5, 0],
-                    rotate: [0, 1, 0, -1, 0],
-                  }
-            }
-            transition={
-              avatarReaction > 0
-                ? { duration: 0.45, ease: 'easeOut' }
-                : { duration: 5, repeat: Infinity, ease: 'easeInOut' }
-            }
-            className="w-full h-full relative rounded-[1.75rem] overflow-hidden border-2 border-white shadow-md bg-sand-50"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08, duration: 0.3 }}
+            className="mb-4 inline-flex items-center gap-1.5 bg-primary-subtle text-primary border border-primary/20 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase shadow-2xs"
           >
-            <Image
-              src="/images/romantic-avatar.jpg"
-              alt="Romantic invitation illustration"
-              fill
-              sizes="(max-width: 640px) 112px, 128px"
-              priority
-              className="object-cover object-center select-none"
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
+            <span>⚠️ Important Question</span>
+          </motion.div>
+
+          {/* ── Refined Avatar / Image Presentation ── */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.88 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.14, duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
+            className="relative mx-auto mb-5 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center"
+          >
+            {/* Ambient soft glow ring behind avatar */}
+            <div
+              className="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-primary/30 via-rose-300/30 to-amber-200/25 blur-lg -z-10"
+              aria-hidden="true"
             />
-          </motion.div>
 
-          {/* Little heart badge accent */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 450, damping: 18 }}
-            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-button border-2 border-white"
-            aria-hidden="true"
-          >
-            ❤️
-          </motion.div>
-        </motion.div>
-
-        {/* ── Main Question Headline ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.32 }}
-        >
-          <h1 className="font-serif text-2xl sm:text-3xl lg:text-[2rem] text-dark leading-snug mb-2 text-balance font-normal">
-            Will you go on a date with me?
-          </h1>
-        </motion.div>
-
-        {/* Supporting Line */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28, duration: 0.3 }}
-        >
-          <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 text-balance max-w-xs mx-auto leading-relaxed">
-            No pressure... okay, maybe a tiny bit. 😌
-          </p>
-        </motion.div>
-
-        {/* ── Interactive Action Arena (YES + Evasive NO) ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.34, duration: 0.3 }}
-          className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1 min-h-[64px]"
-        >
-          {/* YES Primary CTA with subtle pulse glow */}
-          <div className="relative w-full sm:w-auto">
-            {!celebrating && !prefersReducedMotion && (
-              <motion.div
-                aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-primary/20 pointer-events-none"
-                animate={{ scale: [1, 1.12, 1], opacity: [0.6, 0, 0.6] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
-
-            <PrimaryButton
-              onClick={handleYes}
-              disabled={celebrating}
-              id="yes-btn"
-              aria-label="Obviously yes, I would love to go on a date"
-              className="w-full sm:w-auto px-8 py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover font-semibold whitespace-nowrap"
+            {/* Floating micro particles around centerpiece */}
+            <motion.span
+              animate={prefersReducedMotion ? {} : { y: [0, -6, 0], opacity: [0.4, 0.9, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-2 -left-2 text-sm select-none pointer-events-none"
+              aria-hidden="true"
             >
-              <span>Obviously YES</span>
-              <span className="text-sm" aria-hidden="true">😌</span>
-            </PrimaryButton>
-          </div>
+              ✨
+            </motion.span>
+            <motion.span
+              animate={prefersReducedMotion ? {} : { y: [0, 5, 0], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+              className="absolute -bottom-2 -left-3 text-xs select-none pointer-events-none"
+              aria-hidden="true"
+            >
+              💕
+            </motion.span>
 
-          {/* Evasive NO Button (Desktop proximity dodge + mobile friendly nudge) */}
-          <div className="w-full sm:w-auto flex justify-center">
-            <NoEscapeButton
-              onSelectNo={handleNo}
-              onDodge={handleNoDodge}
-              id="no-btn"
-              disabled={celebrating}
-              className="w-full sm:w-auto"
-            />
-          </div>
-        </motion.div>
+            {/* Reaction bubble when NO button dodges */}
+            <AnimatePresence>
+              {reactionBubble && !prefersReducedMotion && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.7 }}
+                  animate={{ opacity: 1, y: -28, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute -top-3 right-0 bg-white border border-primary/20 text-dark font-sans font-semibold text-xs px-2.5 py-1 rounded-full shadow-md z-20 pointer-events-none whitespace-nowrap"
+                >
+                  {reactionBubble}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Humorous micro-footer */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
-          className="text-xs text-muted/70 tracking-wide font-sans mt-6"
-        >
-          Choose wisely 👀
-        </motion.p>
-      </motion.div>
+            {/* Avatar Container with idle breathing + cheeky dodge reaction */}
+            <motion.div
+              key={avatarReaction}
+              animate={
+                prefersReducedMotion
+                  ? {}
+                  : avatarReaction > 0
+                  ? {
+                      y: [0, -10, 0],
+                      rotate: [0, -7, 7, 0],
+                      scale: [1, 1.06, 1],
+                    }
+                  : {
+                      y: [0, -4, 0],
+                      rotate: [0, 1, 0, -1, 0],
+                    }
+              }
+              transition={
+                avatarReaction > 0
+                  ? { duration: 0.42, ease: 'easeOut' }
+                  : { duration: 4.8, repeat: Infinity, ease: 'easeInOut' }
+              }
+              className="w-full h-full relative rounded-[1.75rem] overflow-hidden border-2 border-white/90 shadow-md bg-sand-50"
+            >
+              <Image
+                src="/images/romantic-avatar.jpg"
+                alt="Romantic invitation illustration"
+                fill
+                sizes="(max-width: 640px) 112px, 128px"
+                priority
+                className="object-cover object-center select-none"
+              />
+            </motion.div>
+
+            {/* Little heart badge accent */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.35, type: 'spring', stiffness: 450, damping: 18 }}
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-button border-2 border-white select-none"
+              aria-hidden="true"
+            >
+              ❤️
+            </motion.div>
+          </motion.div>
+
+          {/* ── Main Question Headline ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22, duration: 0.32 }}
+          >
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-[2.1rem] text-dark leading-snug mb-2 text-balance font-normal">
+              Will you go on a{' '}
+              <span className="font-serif italic text-primary block sm:inline">date with me?</span>
+            </h1>
+          </motion.div>
+
+          {/* Supporting Line */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28, duration: 0.3 }}
+          >
+            <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 text-balance max-w-xs mx-auto leading-relaxed">
+              No pressure... okay, maybe a tiny bit.&nbsp;😌
+            </p>
+          </motion.div>
+
+          {/* ── Interactive Action Arena (YES + Evasive NO) ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.34, duration: 0.3 }}
+            className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1 min-h-[64px]"
+          >
+            {/* YES Primary CTA with subtle pulse glow */}
+            <div className="relative w-full sm:w-auto">
+              {!celebrating && !prefersReducedMotion && (
+                <motion.div
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full bg-primary/25 pointer-events-none"
+                  animate={{ scale: [1, 1.14, 1], opacity: [0.65, 0, 0.65] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
+
+              <PrimaryButton
+                onClick={handleYes}
+                disabled={celebrating}
+                id="yes-btn"
+                aria-label="Obviously yes, I would love to go on a date"
+                className="w-full sm:w-auto px-8 py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover font-semibold whitespace-nowrap"
+              >
+                <span>Obviously YES</span>
+                <span className="text-sm" aria-hidden="true">😌</span>
+              </PrimaryButton>
+            </div>
+
+            {/* Evasive NO Button (Desktop proximity dodge + mobile friendly nudge) */}
+            <div className="w-full sm:w-auto flex justify-center">
+              <NoEscapeButton
+                onSelectNo={handleNo}
+                onDodge={handleNoDodge}
+                id="no-btn"
+                disabled={celebrating}
+                className="w-full sm:w-auto"
+              />
+            </div>
+          </motion.div>
+
+          {/* Humorous micro-footer */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="text-xs text-muted/70 tracking-wide font-sans mt-6"
+          >
+            Choose wisely 👀
+          </motion.p>
+        </DateInviteCard>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import DateInviteCard from '@/components/ui/DateInviteCard';
 
 export default function InvitationSuccessScreen() {
   const searchParams = useSearchParams();
@@ -106,11 +107,37 @@ export default function InvitationSuccessScreen() {
         <div className="text-center mb-6">
           <FadeIn delay={0.08}>
             <div className="relative inline-flex items-center justify-center mb-4">
+              {/* Floating celebration micro-sparkles */}
+              <motion.span
+                animate={{ scale: [1, 1.25, 1], opacity: [0.6, 1, 0.6], y: [0, -3, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-2 -left-2 text-base select-none pointer-events-none"
+              >
+                ✨
+              </motion.span>
+              <motion.span
+                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.9, 0.5], y: [0, -4, 0] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                className="absolute -top-3 -right-3 text-sm select-none pointer-events-none"
+              >
+                💕
+              </motion.span>
+              <motion.span
+                animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+                className="absolute -bottom-2 -left-3 text-xs select-none pointer-events-none"
+              >
+                🎉
+              </motion.span>
+
+              {/* Ambient glow behind celebration envelope */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/30 to-pink-200/50 blur-lg -z-10" />
+
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 20, delay: 0.1 }}
-                className="w-20 h-20 rounded-full bg-primary-subtle border-2 border-primary/25 flex items-center justify-center text-4xl shadow-card"
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-white via-rose-50 to-pink-100/80 border-2 border-primary/25 flex items-center justify-center text-4xl shadow-card"
               >
                 💌
               </motion.div>
@@ -122,6 +149,13 @@ export default function InvitationSuccessScreen() {
               >
                 ✓
               </motion.div>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.14}>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-semibold mb-3 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Ready to Share</span>
             </div>
           </FadeIn>
 
@@ -139,8 +173,7 @@ export default function InvitationSuccessScreen() {
         </div>
 
         {/* Link Card & Action Container */}
-        <FadeIn delay={0.34}>
-          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 space-y-6">
+        <DateInviteCard delay={0.32} className="space-y-6">
             {/* Shareable Link Display */}
             <div>
               <label
@@ -242,8 +275,7 @@ export default function InvitationSuccessScreen() {
                 <span aria-hidden="true">↗</span>
               </Link>
             </div>
-          </div>
-        </FadeIn>
+        </DateInviteCard>
 
         {/* Create Another Action */}
         <FadeIn delay={0.46}>

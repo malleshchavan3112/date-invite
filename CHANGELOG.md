@@ -1,5 +1,36 @@
 # Changelog
 
+## [Phase 7.5] — 2026-09-24
+
+### Added
+- **Multi-Layered Living Atmospheric Background (`AnimatedRomanticBackground` / `DecorativeBackground`)**:
+  - Layer 1: Three slow-drifting radial gradient blobs (`#FFE4EC`, `#FFF1F5`, `#FFF8F5`) creating warm depth and subtle motion (18–26s float cycles).
+  - Layer 2: Floating romantic SVG vector doodles (hearts `♡`, sparkles `✦`/`✧`, envelopes `✉`, floral sprigs `✿`, calendar icons `📅`) moving diagonally with varied opacities and subtle rotations.
+  - Layer 3: Subtle glowing stardust particles with gentle twinkling.
+  - Viewport-aware density control (4–8 items on mobile, 8–16 on desktop) avoiding clutter and zero interaction interference (`pointer-events-none`).
+  - Full `prefers-reduced-motion` compliance (gentle static opacity, zero transform animation).
+- **Paper/Glass Hybrid Surface System (`DateInviteCard`)**:
+  - Translucent warm cream surface with backdrop blur (`rgba(255,255,255,0.92)` to `rgba(255,253,249,0.90)`).
+  - Soft inner border highlight (`ring-1 ring-white/70`), subtle top-edge paper sheen, and layered ambient drop shadows with warm rose tint.
+  - Optional ambient halo glow (`glow={true}`) for emotional focal points.
+- **Micro-Interactions & Rich Visual Focal Points**:
+  - **C01 (Creator Studio)**: Floating 3D-styled sealed envelope centerpiece visual with wax-seal heart and micro-sparkles, and "Date Invitation Studio" eyebrow badge.
+  - **C02 (Invitation Created)**: Celebratory floating particles (`✨`, `💕`, `🎉`), animated "Ready to Share" pulse badge, and paper artifact link card.
+  - **P01/P02 (Landing)**: Cinematic sealed envelope reveal with romantic halo glow and "Just For You" badge.
+  - **P03 (Main Date Question)**: Editorial typography (`Will you go on a *date with me?*`), atmospheric halo backglow behind avatar, floating micro-particles, and cheeky reaction speech bubbles on NO button evasion.
+  - **P04 (Playful NO)**: Expressive animated character visual (`🙈`, `🥺`, `🫣`) per attempt with bounded evasive arena.
+  - **P05 (Respectful NO)**: Peaceful botanical illustration (`🌿`), warm comforting copy (`No worries. 🤝`).
+  - **P06–P12 (Date Planning Journey)**:
+    - Interactive journey progress bar with chapter titles (`01 / THE FUN BEGINS ✨`, `02 / THE PLAN 👀`, etc.), thematic step badges, and thin animated glowing pink progress indicator.
+    - ChoiceCard micro-interactions: gentle hover lift, selected spring scale (`1.01`), primary pink border, subtle selected glow (`shadow-[0_6px_22px_-2px_rgba(255,79,123,0.22)]`), and micro-sparkle badge.
+    - P12 Date Plan Dossier: Labeled cards (`WHO`, `DATE`, `DAY`, `TIME`, `VIBE`, `MESSAGE`) and sealed envelope visual.
+  - **P13 (Submitting)**: Soaring flying envelope with trailing particles and animated gradient shimmer progress bar.
+  - **P14 (Success)**: Celebratory opened envelope, gentle falling celebration sparkles, and keepsake recap card.
+  - **P15 (Invalid)**: Closed envelope with question mark badge.
+  - **P16 (Error)**: Envelope with warm warning badge and reassurance.
+
+---
+
 ## [Phase 7.0] — 2026-09-24
 
 ### Added

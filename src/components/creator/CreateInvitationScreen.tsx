@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { createInvitationAction } from '@/lib/actions';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import DateInviteCard from '@/components/ui/DateInviteCard';
 
 export default function CreateInvitationScreen() {
   const router = useRouter();
@@ -81,11 +83,39 @@ export default function CreateInvitationScreen() {
       <DecorativeBackground />
 
       <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+        {/* Floating sealed invitation centerpiece visual */}
+        <div className="relative mx-auto mb-3 w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+          <motion.div
+            animate={{
+              y: [0, -6, 0],
+              rotate: [-2, 2, -2],
+            }}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="relative flex items-center justify-center w-full h-full"
+          >
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-primary/25 via-pink-200/40 to-transparent blur-md -z-10" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-white via-rose-50/90 to-pink-100/70 border border-primary/20 shadow-md flex items-center justify-center relative">
+              <span className="text-2xl sm:text-3xl select-none" role="img" aria-label="Sealed love letter">💌</span>
+              <motion.span
+                animate={{ scale: [1, 1.25, 1], opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-1 -right-1 text-xs select-none"
+              >
+                ✨
+              </motion.span>
+            </div>
+          </motion.div>
+        </div>
+
         {/* Header Content */}
         <div className="text-center mb-6">
           <FadeIn delay={0.08}>
             <span className="inline-block text-xs uppercase tracking-widest text-primary font-semibold mb-2.5 bg-primary-subtle border border-primary/20 px-3.5 py-1 rounded-full">
-              Date Invitation
+              Date Invitation Studio
             </span>
           </FadeIn>
 
@@ -104,9 +134,8 @@ export default function CreateInvitationScreen() {
         </div>
 
         {/* Form Card */}
-        <FadeIn delay={0.32}>
-          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300">
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        <DateInviteCard delay={0.28}>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* General error banner */}
               {errors.general && (
                 <div
@@ -218,8 +247,7 @@ export default function CreateInvitationScreen() {
                 </PrimaryButton>
               </div>
             </form>
-          </div>
-        </FadeIn>
+        </DateInviteCard>
 
         {/* Footer Guarantee */}
         <FadeIn delay={0.42}>

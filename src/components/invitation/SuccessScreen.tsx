@@ -8,6 +8,8 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FadeIn } from '@/components/ui/PageTransition';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
 
+import DateInviteCard from '@/components/ui/DateInviteCard';
+
 interface SuccessScreenProps {
   invitation: PublicInvitation;
   answers: QuestionnaireAnswers;
@@ -112,17 +114,12 @@ export default function SuccessScreen({
       )}
 
       <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 22, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-          className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 text-center"
-        >
+        <DateInviteCard glow>
           {/* Celebratory Icon & Badge */}
           <div className="relative inline-flex items-center justify-center mb-5">
             {/* Soft pink glow backdrop */}
             <div
-              className="w-20 h-20 rounded-full bg-primary-subtle border border-primary/25 flex items-center justify-center relative shadow-sm"
+              className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-100 to-rose-50 border border-primary/25 flex items-center justify-center relative shadow-sm"
               aria-hidden="true"
             >
               {!prefersReducedMotion && (
@@ -132,16 +129,16 @@ export default function SuccessScreen({
                   transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
                 />
               )}
-              {/* Party popper emoji */}
+              {/* Opened celebration letter emoji */}
               <motion.div
                 initial={prefersReducedMotion ? {} : { scale: 0.7, rotate: -12 }}
                 animate={prefersReducedMotion ? {} : { scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', damping: 14, stiffness: 220 }}
-                className="text-4xl select-none leading-none"
+                className="text-4xl select-none leading-none drop-shadow-sm"
                 role="img"
                 aria-label="Celebration"
               >
-                🎉
+                💌
               </motion.div>
             </div>
 
@@ -150,7 +147,7 @@ export default function SuccessScreen({
               initial={prefersReducedMotion ? {} : { scale: 0 }}
               animate={prefersReducedMotion ? {} : { scale: 1 }}
               transition={{ delay: 0.25, type: 'spring', stiffness: 450, damping: 18 }}
-              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-button border-2 border-white"
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-primary to-[#E93668] text-white flex items-center justify-center text-xs font-bold shadow-button border-2 border-white select-none"
               aria-hidden="true"
             >
               ✓
@@ -183,13 +180,13 @@ export default function SuccessScreen({
 
           {/* Tasteful Summary Badge */}
           <FadeIn delay={0.34}>
-            <div className="rounded-2xl bg-sand-50/80 border border-border/70 p-4 mb-6 text-left">
+            <div className="rounded-2xl bg-sand-50/80 border border-primary/15 p-4 mb-6 text-left shadow-2xs">
               <span className="block text-[11px] uppercase tracking-wider font-semibold text-muted mb-2.5">
                 What you shared
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {answers.recipient_name && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Your Name</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {answers.recipient_name}
@@ -197,7 +194,7 @@ export default function SuccessScreen({
                   </div>
                 )}
                 {answers.date_type && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Activity</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {DATE_TYPE_LABELS[answers.date_type] || answers.date_type}
@@ -205,7 +202,7 @@ export default function SuccessScreen({
                   </div>
                 )}
                 {answers.preferred_day && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">When</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {DAY_LABELS[answers.preferred_day] || answers.preferred_day}
@@ -213,7 +210,7 @@ export default function SuccessScreen({
                   </div>
                 )}
                 {answers.preferred_time && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Time</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {TIME_LABELS[answers.preferred_time] || answers.preferred_time}
@@ -221,7 +218,7 @@ export default function SuccessScreen({
                   </div>
                 )}
                 {answers.date_vibe && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Vibe</span>
                     <span className="font-semibold text-dark truncate block mt-0.5">
                       {VIBE_LABELS[answers.date_vibe] || answers.date_vibe}
@@ -229,7 +226,7 @@ export default function SuccessScreen({
                   </div>
                 )}
                 {answers.message && (
-                  <div className="bg-white rounded-xl p-2.5 border border-border/50 col-span-2 shadow-2xs">
+                  <div className="bg-white/90 rounded-xl p-2.5 border border-border/60 col-span-2 shadow-2xs">
                     <span className="block text-muted/70 text-[10px] uppercase font-bold tracking-wider">Note</span>
                     <span className="font-medium text-dark italic truncate block mt-0.5">
                       &ldquo;{answers.message}&rdquo;
@@ -249,14 +246,14 @@ export default function SuccessScreen({
                   onClick={onDone}
                   fullWidth
                   id="success-done-btn"
-                  className="py-3.5"
+                  className="py-3.5 shadow-button hover:shadow-button-hover"
                 >
                   Done
                 </PrimaryButton>
               ) : (
                 <Link
                   href="/"
-                  className="btn-primary w-full text-center py-3.5"
+                  className="btn-primary w-full text-center py-3.5 shadow-button hover:shadow-button-hover"
                   id="success-home-link"
                 >
                   Done
@@ -271,7 +268,7 @@ export default function SuccessScreen({
               </Link>
             </div>
           </FadeIn>
-        </motion.div>
+        </DateInviteCard>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import DateInviteCard from '@/components/ui/DateInviteCard';
 
 interface PlayfulNoProps {
   onActuallyYes: () => void;
@@ -16,15 +17,18 @@ const MESSAGES = [
   null,
   {
     heading: 'Okay okay... 😭',
-    body: "Fair enough. Let's make sure that's actually what you mean.",
+    body: "I respect the decision... but let's make sure that's actually what you mean.",
+    emoji: '🙈',
   },
   {
     heading: 'Still dodging? 👀',
     body: "We're not crying, you are... okay maybe a tiny bit.",
+    emoji: '🥺',
   },
   {
-    heading: 'Alright, one last check 🥺',
+    heading: 'Alright, one last check 💔',
     body: 'Fair enough. Is this genuinely your final answer?',
+    emoji: '🫣',
   },
 ] as const;
 
@@ -88,93 +92,116 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="w-full max-w-sm sm:max-w-md mx-auto bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300 relative z-10 text-center"
-      >
-        {/* Animated heading — swaps per attempt */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={attempts}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+        <DateInviteCard>
+          {/* Animated expressive character visual */}
+          <div className="relative inline-flex items-center justify-center mb-4">
+            <div
+              className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-pink-100/60 border border-primary/20 flex items-center justify-center shadow-inner relative"
+              aria-hidden="true"
+            >
+              <motion.div
+                key={attempts}
+                animate={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        rotate: [-6, 6, -6],
+                        y: [0, -3, 0],
+                      }
+                }
+                transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-4xl select-none leading-none"
+                role="img"
+                aria-label="Playful sad character"
+              >
+                {currentMsg?.emoji || '😭'}
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Animated heading — swaps per attempt */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={attempts}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 text-balance leading-snug font-normal">
+                {currentMsg?.heading}
+              </h1>
+              <p className="font-sans text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed">
+                {currentMsg?.body}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Question reminder */}
+          <p className="font-sans text-xs text-muted/70 italic mb-6">
+            &ldquo;Will you go on a date with me?&rdquo;
+          </p>
+
+          {/* YES — always prominent, always accessible */}
+          <PrimaryButton
+            onClick={handleActuallyYes}
+            fullWidth
+            className="mb-5 text-base sm:text-lg shadow-button hover:shadow-button-hover"
+            id="actually-yes-btn"
+            aria-label="Change my mind — actually yes"
           >
-            <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 text-balance leading-snug font-normal">
-              {currentMsg?.heading}
-            </h1>
-            <p className="font-sans text-sm sm:text-base text-muted-foreground mb-6 leading-relaxed">
-              {currentMsg?.body}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+            Actually YES ❤️
+          </PrimaryButton>
 
-        {/* Question reminder */}
-        <p className="font-sans text-xs text-muted/70 italic mb-6">
-          &ldquo;Will you go on a date with me?&rdquo;
-        </p>
-
-        {/* YES — always prominent, always accessible */}
-        <PrimaryButton
-          onClick={handleActuallyYes}
-          fullWidth
-          className="mb-5 text-base sm:text-lg"
-          id="actually-yes-btn"
-          aria-label="Change my mind — actually yes"
-        >
-          Actually YES ❤️
-        </PrimaryButton>
-
-        {/* NO — dodges playfully within bounded arena */}
-        <div
-          className="relative h-16 flex items-center justify-center overflow-visible"
-          aria-label="No button area"
-        >
-          <motion.div
-            animate={dodgePos}
-            transition={
-              prefersReducedMotion
-                ? { duration: 0.01 }
-                : {
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 20,
-                    mass: 0.7,
-                  }
-            }
+          {/* NO — dodges playfully within bounded arena */}
+          <div
+            className="relative h-16 flex items-center justify-center overflow-visible"
+            aria-label="No button area"
           >
             <motion.div
-              initial={prefersReducedMotion ? {} : { rotate: -6 }}
-              animate={prefersReducedMotion ? {} : { rotate: [0, -5, 5, -3, 3, 0] }}
-              transition={{ delay: 0.2, duration: 0.5, ease: 'easeInOut' }}
+              animate={dodgePos}
+              transition={
+                prefersReducedMotion
+                  ? { duration: 0.01 }
+                  : {
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 20,
+                      mass: 0.7,
+                    }
+              }
             >
-              <SecondaryButton
-                onClick={handleNoDodge}
-                id="no-dodge-btn"
-                aria-label={`No — attempt ${attempts} of 3`}
-                className="whitespace-nowrap text-sm px-6 py-2.5"
+              <motion.div
+                initial={prefersReducedMotion ? {} : { rotate: -6 }}
+                animate={prefersReducedMotion ? {} : { rotate: [0, -5, 5, -3, 3, 0] }}
+                transition={{ delay: 0.2, duration: 0.5, ease: 'easeInOut' }}
               >
-                <span>NO</span>
-                <span className="text-xs" aria-hidden="true">😏</span>
-              </SecondaryButton>
+                <SecondaryButton
+                  onClick={handleNoDodge}
+                  id="no-dodge-btn"
+                  aria-label={`No — attempt ${attempts} of 3`}
+                  className="whitespace-nowrap text-sm px-6 py-2.5"
+                >
+                  <span>NO</span>
+                  <span className="text-xs" aria-hidden="true">😏</span>
+                </SecondaryButton>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
 
-        {/* Attempt counter — subtle accessibility aid */}
-        <p
-          className="font-sans text-xs text-muted/60 mt-3"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {attempts < 3
-            ? `${3 - attempts} more ${3 - attempts === 1 ? 'chance' : 'chances'} to change your mind`
-            : ''}
-        </p>
-      </motion.div>
+          {/* Attempt counter — subtle accessibility aid */}
+          <p
+            className="font-sans text-xs text-muted/60 mt-3"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {attempts < 3
+              ? `${3 - attempts} more ${3 - attempts === 1 ? 'chance' : 'chances'} to change your mind`
+              : ''}
+          </p>
+        </DateInviteCard>
+      </div>
 
       {/* ── Confirmation Modal ── */}
       <AnimatePresence>

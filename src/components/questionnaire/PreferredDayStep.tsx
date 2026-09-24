@@ -4,8 +4,8 @@ import { useState } from 'react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import ChoiceCard from '@/components/ui/ChoiceCard';
 import QuestionnaireProgress from './QuestionnaireProgress';
-import { FadeIn } from '@/components/ui/PageTransition';
 import DecorativeBackground from '@/components/ui/DecorativeBackground';
+import DateInviteCard from '@/components/ui/DateInviteCard';
 
 interface PreferredDayStepProps {
   value: string;
@@ -46,58 +46,57 @@ export default function PreferredDayStep({
       <DecorativeBackground />
 
       <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <FadeIn delay={0.05}>
-          <div className="bg-surface/95 backdrop-blur-md rounded-[2.25rem] p-6 sm:p-9 shadow-card hover:shadow-card-hover border border-border/80 transition-shadow duration-300">
-            {/* Header progress & back */}
-            <QuestionnaireProgress
-              currentStep={3}
-              totalSteps={6}
-              onBack={onBack}
-              isEditingFromReview={isEditingFromReview}
-            />
+        <DateInviteCard>
+          {/* Header progress & back */}
+          <QuestionnaireProgress
+            currentStep={3}
+            totalSteps={6}
+            onBack={onBack}
+            isEditingFromReview={isEditingFromReview}
+          />
 
-            {/* Question & Supporting Copy */}
-            <div className="mb-6 text-left">
-              <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                When are you usually free?&nbsp;🗓️
-              </h1>
-              <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Pick whatever day works best for your schedule.
-              </p>
-            </div>
-
-            {/* Choice Cards List */}
-            <div
-              className="space-y-2.5 mb-6"
-              role="radiogroup"
-              aria-label="Preferred day options"
-            >
-              {DAYS.map((item) => (
-                <ChoiceCard
-                  key={item.id}
-                  id={`preferred-day-${item.id}`}
-                  label={item.label}
-                  emoji={item.emoji}
-                  description={item.description}
-                  selected={selected === item.id}
-                  onSelect={() => setSelected(item.id)}
-                />
-              ))}
-            </div>
-
-            {/* Continue CTA */}
-            <PrimaryButton
-              type="button"
-              onClick={handleContinue}
-              disabled={!selected}
-              fullWidth
-              id="preferred-day-continue-btn"
-              className="py-3.5 text-base sm:text-lg"
-            >
-              {isEditingFromReview ? 'Save & Return to Review' : 'Continue'}
-            </PrimaryButton>
+          {/* Question & Supporting Copy */}
+          <div className="mb-6 text-left">
+            <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
+              When are you{' '}
+              <span className="font-serif italic text-primary">usually free?</span>&nbsp;🗓️
+            </h1>
+            <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
+              Pick whatever day works best for your schedule.
+            </p>
           </div>
-        </FadeIn>
+
+          {/* Choice Cards List */}
+          <div
+            className="space-y-2.5 mb-6"
+            role="radiogroup"
+            aria-label="Preferred day options"
+          >
+            {DAYS.map((item) => (
+              <ChoiceCard
+                key={item.id}
+                id={`preferred-day-${item.id}`}
+                label={item.label}
+                emoji={item.emoji}
+                description={item.description}
+                selected={selected === item.id}
+                onSelect={() => setSelected(item.id)}
+              />
+            ))}
+          </div>
+
+          {/* Continue CTA */}
+          <PrimaryButton
+            type="button"
+            onClick={handleContinue}
+            disabled={!selected}
+            fullWidth
+            id="preferred-day-continue-btn"
+            className="py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover"
+          >
+            {isEditingFromReview ? 'Save & Return to Review' : 'Continue'}
+          </PrimaryButton>
+        </DateInviteCard>
       </div>
     </div>
   );
