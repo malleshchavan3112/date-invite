@@ -65,12 +65,16 @@ export default function CreateInvitationScreen() {
         try {
           sessionStorage.setItem('dateinvite_last_slug', result.slug);
           sessionStorage.setItem('dateinvite_creator_name', result.creator_name || creatorName.trim());
+          if (result.creator_access_token) {
+            sessionStorage.setItem('dateinvite_last_token', result.creator_access_token);
+          }
         } catch {
           // Non-critical
         }
       }
 
-      router.push(`/create/success?slug=${encodeURIComponent(result.slug)}`);
+      const tokenParam = result.creator_access_token ? `&token=${encodeURIComponent(result.creator_access_token)}` : '';
+      router.push(`/create/success?slug=${encodeURIComponent(result.slug)}${tokenParam}`);
     } catch {
       setErrors({ general: 'Network error occurred. Please try again.' });
       setIsLoading(false);

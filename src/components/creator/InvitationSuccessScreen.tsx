@@ -14,16 +14,24 @@ export default function InvitationSuccessScreen() {
   const searchParams = useSearchParams();
 
   const [slug, setSlug] = useState<string>('');
+  const [token, setToken] = useState<string>('');
   const [invitationUrl, setInvitationUrl] = useState<string>('');
-  const [copied, setCopied] = useState<boolean>(false);
+  const [dashboardUrl, setDashboardUrl] = useState<string>('');
+  const [copiedInvite, setCopiedInvite] = useState<boolean>(false);
+  const [copiedDashboard, setCopiedDashboard] = useState<boolean>(false);
   const [copyAnnouncement, setCopyAnnouncement] = useState<string>('');
 
   useEffect(() => {
     const paramSlug = searchParams.get('slug');
+    const paramToken = searchParams.get('token');
     let resolvedSlug = paramSlug;
+    let resolvedToken = paramToken;
 
     if (!resolvedSlug && typeof window !== 'undefined') {
       resolvedSlug = sessionStorage.getItem('dateinvite_last_slug') || 'demo-date';
+    }
+    if (!resolvedToken && typeof window !== 'undefined') {
+      resolvedToken = sessionStorage.getItem('dateinvite_last_token') || '';
     }
 
     if (!resolvedSlug) {
@@ -31,6 +39,7 @@ export default function InvitationSuccessScreen() {
     }
 
     setSlug(resolvedSlug);
+    setToken(resolvedToken || '');
 
     const origin =
       typeof window !== 'undefined' && window.location.origin
@@ -38,9 +47,12 @@ export default function InvitationSuccessScreen() {
         : 'https://dateinvite.me';
 
     setInvitationUrl(`${origin}/invite/${resolvedSlug}`);
+    if (resolvedToken) {
+      setDashboardUrl(`${origin}/manage/${resolvedToken}`);
+    }
   }, [searchParams]);
 
-  const handleCopyLink = async () => {
+  const handleCopyInviteLink = async () => {
     if (!invitationUrl) return;
 
     try {
@@ -58,14 +70,43 @@ export default function InvitationSuccessScreen() {
         document.body.removeChild(textArea);
       }
 
-      setCopied(true);
+      setCopiedInvite(true);
       setCopyAnnouncement('Invitation link copied to clipboard.');
       setTimeout(() => {
-        setCopied(false);
+        setCopiedInvite(false);
         setCopyAnnouncement('');
       }, 2500);
     } catch {
       setCopyAnnouncement('Failed to copy. Please manually copy the link.');
+    }
+  };
+
+  const handleCopyDashboardLink = async () => {
+    if (!dashboardUrl) return;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(dashboardUrl);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = dashboardUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+
+      setCopiedDashboard(true);
+      setCopyAnnouncement('Dashboard link copied to clipboard.');
+      setTimeout(() => {
+        setCopiedDashboard(false);
+        setCopyAnnouncement('');
+      }, 2500);
+    } catch {
+      setCopyAnnouncement('Failed to copy dashboard link.');
     }
   };
 
@@ -79,11 +120,11 @@ export default function InvitationSuccessScreen() {
         });
       } catch (err: unknown) {
         if ((err as Error)?.name !== 'AbortError') {
-          handleCopyLink();
+          handleCopyInviteLink();
         }
       }
     } else {
-      handleCopyLink();
+      handleCopyInviteLink();
     }
   };
 
@@ -174,107 +215,181 @@ export default function InvitationSuccessScreen() {
 
         {/* Link Card & Action Container */}
         <DateInviteCard delay={0.32} className="space-y-6">
-            {/* Shareable Link Display */}
-            <div>
+          {/* ── SECTION 1: PUBLIC INVITATION LINK ── */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
               <label
                 htmlFor="invitation-url-display"
-                className="block text-xs uppercase tracking-wider text-muted font-sans font-semibold mb-2"
+                className="block text-xs uppercase tracking-wider text-muted font-sans font-bold flex items-center gap-1.5"
               >
-                Your Private Invitation Link
+                <span aria-hidden="true">💌</span>
+                <span>Invitation Link (For Your Date)</span>
               </label>
-              <div
-                id="invitation-url-display"
-                className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-sand-50/80 border border-border text-dark text-xs sm:text-sm font-mono break-all select-all group hover:border-primary/40 transition-colors"
+            </div>
+            <div
+              id="invitation-url-display"
+              className="flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-sand-50/80 border border-border text-dark text-xs sm:text-sm font-mono break-all select-all group hover:border-primary/40 transition-colors"
+            >
+              <span className="truncate text-dark/90 font-medium">
+                {invitationUrl || 'Generating link…'}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyInviteLink}
+                aria-label="Copy invitation link"
+                className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-primary-subtle transition-colors flex-shrink-0"
+                title="Copy to clipboard"
               >
-                <span className="truncate text-dark/90 font-medium">
-                  {invitationUrl || 'Generating link…'}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  aria-label="Copy invitation link"
-                  className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-primary-subtle transition-colors flex-shrink-0"
-                  title="Copy to clipboard"
-                >
-                  <CopyIcon />
-                </button>
+                {copiedInvite ? <CheckIcon /> : <CopyIcon />}
+              </button>
+            </div>
+          </div>
+
+          {/* Actions Stack for Public Invitation */}
+          <div className="space-y-3 pt-1">
+            {/* Primary: Copy Link Button */}
+            <PrimaryButton
+              type="button"
+              onClick={handleCopyInviteLink}
+              fullWidth
+              id="copy-link-btn"
+              className={copiedInvite ? '!bg-emerald-600 hover:!bg-emerald-700 py-3.5' : 'py-3.5'}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {copiedInvite ? (
+                  <motion.span
+                    key="copied"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <CheckIcon />
+                    Link Copied ✓
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="copy"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <CopyIcon />
+                    Copy Invitation Link
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </PrimaryButton>
+
+            {/* Secondary: Native Share Button */}
+            <SecondaryButton
+              type="button"
+              onClick={handleNativeShare}
+              fullWidth
+              id="share-invitation-btn"
+              className="py-3"
+            >
+              <ShareIcon />
+              Share Invitation
+            </SecondaryButton>
+
+            {/* Optional: WhatsApp Share Button */}
+            <a
+              href={getWhatsAppShareUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              id="whatsapp-share-btn"
+              className="w-full inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3 text-sm sm:text-base font-semibold transition-all duration-180 bg-[#25D366] text-white hover:bg-[#20BA5A] shadow-sm hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 min-h-[44px]"
+            >
+              <WhatsAppIcon />
+              Share on WhatsApp
+            </a>
+          </div>
+
+          {/* ── SECTION 2: PRIVATE CREATOR DASHBOARD ── */}
+          <div className="pt-5 border-t border-border/70 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-base" aria-hidden="true">🔐</span>
+              <div>
+                <h2 className="text-sm font-bold text-dark font-serif">
+                  Creator Dashboard
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Use your private dashboard link to check your response later.
+                </p>
               </div>
             </div>
 
-            {/* Actions Stack */}
-            <div className="space-y-3 pt-1">
-              {/* Primary: Copy Link Button */}
-              <PrimaryButton
-                type="button"
-                onClick={handleCopyLink}
-                fullWidth
-                id="copy-link-btn"
-                className={copied ? '!bg-emerald-600 hover:!bg-emerald-700 py-3.5' : 'py-3.5'}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  {copied ? (
-                    <motion.span
-                      key="copied"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      className="inline-flex items-center gap-2"
-                    >
-                      <CheckIcon />
-                      Link Copied ✓
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="copy"
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      className="inline-flex items-center gap-2"
-                    >
-                      <CopyIcon />
-                      Copy Link
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </PrimaryButton>
-
-              {/* Secondary: Native Share Button */}
-              <SecondaryButton
-                type="button"
-                onClick={handleNativeShare}
-                fullWidth
-                id="share-invitation-btn"
-                className="py-3"
-              >
-                <ShareIcon />
-                Share Invitation
-              </SecondaryButton>
-
-              {/* Optional: WhatsApp Share Button */}
-              <a
-                href={getWhatsAppShareUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                id="whatsapp-share-btn"
-                className="w-full inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-sm sm:text-base font-semibold transition-all duration-180 bg-[#25D366] text-white hover:bg-[#20BA5A] shadow-sm hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 min-h-[44px]"
-              >
-                <WhatsAppIcon />
-                Share on WhatsApp
-              </a>
+            {/* Important Save Callout */}
+            <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-3.5 text-xs text-amber-900 leading-relaxed shadow-2xs">
+              <div className="flex items-start gap-2">
+                <span className="text-amber-600 text-sm mt-0.5" aria-hidden="true">⚠️</span>
+                <div>
+                  <strong className="font-semibold block mb-0.5">Save this private dashboard link:</strong>
+                  You can use it to return to your invitation anytime without creating an account.
+                </div>
+              </div>
             </div>
 
-            {/* Preview link for creator testing */}
-            <div className="pt-3 border-t border-border/60 text-center">
-              <p className="text-xs text-muted mb-2">Want to see what they will see?</p>
-              <Link
-                href={`/invite/${slug}`}
-                target="_blank"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-hover underline underline-offset-4"
-              >
-                <span>Preview your invitation</span>
-                <span aria-hidden="true">↗</span>
-              </Link>
+            {/* Dashboard Actions */}
+            <div className="space-y-2 pt-1">
+              {dashboardUrl ? (
+                <>
+                  <Link href={`/manage/${token}`} className="block w-full">
+                    <button
+                      type="button"
+                      id="open-dashboard-btn"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all duration-200 bg-sand-100 hover:bg-sand-200 text-dark border border-border/80 shadow-xs hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    >
+                      <span>Open Creator Dashboard</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyDashboardLink}
+                    id="copy-dashboard-link-btn"
+                    className={`w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold transition-all border ${
+                      copiedDashboard
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : 'bg-white hover:bg-sand-50 text-muted-foreground hover:text-dark border-border'
+                    }`}
+                  >
+                    {copiedDashboard ? (
+                      <>
+                        <CheckIcon className="w-4 h-4 text-emerald-600" />
+                        <span>Dashboard link copied! ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <CopyIcon className="w-4 h-4" />
+                        <span>Copy Dashboard Link</span>
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <div className="text-center py-2 text-xs text-muted">
+                  Creating private dashboard link…
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Preview link for creator testing */}
+          <div className="pt-3 border-t border-border/60 text-center">
+            <p className="text-xs text-muted mb-1.5">Want to see what they will see?</p>
+            <Link
+              href={`/invite/${slug}`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-hover underline underline-offset-4"
+            >
+              <span>Preview your public invitation</span>
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
         </DateInviteCard>
 
         {/* Create Another Action */}
@@ -296,9 +411,9 @@ export default function InvitationSuccessScreen() {
 
 // ─── Inline SVG Icons ──────────────────────────────────────────────────────
 
-function CopyIcon() {
+function CopyIcon({ className = 'w-5 h-5 flex-shrink-0' }: { className?: string }) {
   return (
-    <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -309,9 +424,9 @@ function CopyIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ className = 'w-5 h-5 flex-shrink-0' }: { className?: string }) {
   return (
-    <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
     </svg>
   );

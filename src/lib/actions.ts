@@ -12,12 +12,13 @@ export interface CreateInvitationActionResult {
   success: boolean;
   slug?: string;
   creator_name?: string;
+  creator_access_token?: string;
   error?: string;
 }
 
 /**
  * Server Action: Creates a new invitation and registers it in the repository.
- * Strictly returns only public non-sensitive data (slug, creator_name).
+ * Returns public slug and private creator access token.
  * Creator email is never returned in client action results.
  */
 export async function createInvitationAction(
@@ -47,6 +48,7 @@ export async function createInvitationAction(
       success: true,
       slug: invitation.slug,
       creator_name: invitation.creator_name,
+      creator_access_token: invitation.creator_access_token,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to create invitation.';
@@ -65,6 +67,26 @@ export async function submitResponseAction(
     return await submitResponse(input);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to submit response.';
+    return {
+      success: false,
+      code: 'UNKNOWN_ERROR',
+      error: message,
+    };
+  }
+}
+
+/**
+ * Server Action: Submits a confirmed NO response.
+ * Records the response in the database so the creator status dashboard updates truthfully.
+ */
+export async function submitNoResponseAction(
+  invitationId: string
+): Promise<SubmitResponseResult> {
+  try {
+    const { submitNoResponse } = await import('./response-repository');
+    return await submitNoResponse(invitationId);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Failed to record response.';
     return {
       success: false,
       code: 'UNKNOWN_ERROR',

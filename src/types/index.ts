@@ -11,6 +11,7 @@ export interface Invitation {
   slug: string;
   creator_name: string;
   creator_email: string;
+  creator_access_token: string;
   title: string;
   intro_text: string;
   active: boolean;
@@ -19,9 +20,9 @@ export interface Invitation {
 
 /**
  * Public invitation representation provided to the recipient client.
- * D016: creator_email is strictly stripped to preserve privacy.
+ * D016: creator_email and creator_access_token are strictly stripped to preserve privacy.
  */
-export type PublicInvitation = Omit<Invitation, 'creator_email'>;
+export type PublicInvitation = Omit<Invitation, 'creator_email' | 'creator_access_token'>;
 
 export interface CreateInvitationInput {
   creator_name: string;
@@ -284,4 +285,44 @@ export interface InvitationState {
   questionnaire: QuestionnaireData;
   submittedResponseId: string | null;
 }
+
+// ─── Phase 9A: Creator Status Page Types ────────────────────────────────────
+
+/**
+ * Public status view of an invitation for the creator status page.
+ * creator_email and internal UUID are strictly omitted.
+ */
+export interface SafeInvitationStatus {
+  slug: string;
+  creator_name: string;
+  title: string;
+  intro_text?: string;
+  active: boolean;
+  created_at: string;
+}
+
+/**
+ * Public status view of a response for the creator status page.
+ * Internal UUIDs are strictly omitted.
+ */
+export interface SafeResponseStatus {
+  answer: AnswerType;
+  recipient_name: string | null;
+  date_type: DateType | null;
+  preferred_day: PreferredDay | null;
+  preferred_time: PreferredTime | null;
+  date_vibe: DateVibe | null;
+  message: string | null;
+  activity_preference: ActivityPreference | null;
+  location_preference: LocationPreference | null;
+  food_preference: FoodPreference | null;
+  spontaneity: SpontaneityLevel | null;
+  created_at: string;
+  submitted_at: string;
+}
+
+export type StatusPageResult =
+  | { status: 'ok'; invitation: SafeInvitationStatus; response: SafeResponseStatus | null }
+  | { status: 'not_found' }
+  | { status: 'error'; error?: string };
 

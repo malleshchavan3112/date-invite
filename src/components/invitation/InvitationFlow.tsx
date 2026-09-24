@@ -9,7 +9,7 @@ import type {
   SubmissionErrorCode,
 } from '@/types';
 import { INITIAL_QUESTIONNAIRE_ANSWERS } from '@/types';
-import { submitResponseAction } from '@/lib/actions';
+import { submitResponseAction, submitNoResponseAction } from '@/lib/actions';
 
 // Phase 2 Screen components
 import LoadingScreen from './LoadingScreen';
@@ -244,7 +244,14 @@ export default function InvitationFlow({ invitation }: InvitationFlowProps) {
         return (
           <PlayfulNo
             onActuallyYes={() => goTo('name', 'forward')}
-            onConfirmNo={() => goTo('no-completion', 'forward')}
+            onConfirmNo={() => {
+              if (invitation?.id) {
+                submitNoResponseAction(invitation.id).catch((err) => {
+                  console.error('Failed to submit NO response:', err);
+                });
+              }
+              goTo('no-completion', 'forward');
+            }}
           />
         );
 

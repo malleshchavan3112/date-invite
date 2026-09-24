@@ -9,6 +9,7 @@ export const DEMO_INVITATION: Invitation = {
   slug: 'demo-date',
   creator_name: 'Alex',
   creator_email: 'alex@example.com',
+  creator_access_token: 'demo-creator-token-12345',
   title: 'A Special Invitation Just for You',
   intro_text: 'Someone who thinks you\'re pretty special has a very important question for you.',
   active: true,

@@ -280,3 +280,118 @@ export async function submitResponse(
     };
   }
 }
+
+/**
+ * Submit a NO response for an invitation.
+ * 
+ * Guarantees:
+ * - Persists answer = 'no' to Supabase responses table.
+ * - Enforces duplicate submission protection (single response per invitation).
+ * - D005: Does NOT trigger an email notification (MVP spec).
+ * - Allows creator status dashboard to reflect the recipient's truthful choice.
+ */
+export async function submitNoResponse(
+  invitationId: string
+): Promise<SubmitResponseResult> {
+  if (!invitationId || invitationId.trim().length === 0) {
+    return {
+      success: false,
+      code: 'VALIDATION_ERROR',
+      error: 'Invitation ID is required.',
+    };
+  }
+
+  const invitation = await getInvitationById(invitationId);
+  if (!invitation) {
+    return {
+      success: false,
+      code: 'INVITATION_NOT_FOUND',
+      error: 'This invitation could not be found.',
+    };
+  }
+
+  if (!invitation.active) {
+    return {
+      success: false,
+      code: 'INVITATION_INACTIVE',
+      error: 'This invitation is no longer active.',
+    };
+  }
+
+  const alreadyExists = await hasResponseForInvitation(invitationId);
+  if (alreadyExists) {
+    return {
+      success: false,
+      code: 'ALREADY_SUBMITTED',
+      error: 'A response has already been submitted for this invitation.',
+    };
+  }
+
+  try {
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase
+      .from('responses')
+      .insert({
+        invitation_id: invitationId,
+        answer: 'no',
+      })
+      .select('id, invitation_id, answer, created_at, submitted_at')
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return {
+          success: false,
+          code: 'ALREADY_SUBMITTED',
+          error: 'A response has already been submitted for this invitation.',
+        };
+      }
+
+      console.error('[response-repository] Error inserting NO response:', error);
+      return {
+        success: false,
+        code: 'UNKNOWN_ERROR',
+        error: error.message || 'Failed to record response.',
+      };
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        code: 'UNKNOWN_ERROR',
+        error: 'Failed to record response.',
+      };
+    }
+
+    const response: Response = {
+      id: data.id,
+      invitation_id: data.invitation_id,
+      answer: 'no',
+      recipient_name: null,
+      date_type: null,
+      preferred_day: null,
+      preferred_time: null,
+      date_vibe: null,
+      message: null,
+      activity_preference: null,
+      location_preference: null,
+      food_preference: null,
+      spontaneity: null,
+      created_at: data.created_at,
+      submitted_at: data.submitted_at || data.created_at,
+    };
+
+    return {
+      success: true,
+      response,
+      emailSent: false,
+    };
+  } catch (err) {
+    console.error('[response-repository] Exception inserting NO response:', err);
+    return {
+      success: false,
+      code: 'UNKNOWN_ERROR',
+      error: err instanceof Error ? err.message : 'An unexpected error occurred.',
+    };
+  }
+}
