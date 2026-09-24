@@ -1,42 +1,55 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface NoEscapeButtonProps {
   onSelectNo: () => void;
+  onDodge?: () => void;
   className?: string;
   id?: string;
   disabled?: boolean;
 }
 
-const PLAYFUL_MOBILE_PHRASES = [
-  'Wait, really? 🥺',
-  'Are you sure? 💔',
-  'Nice try! 😏',
+const DESKTOP_DODGE_LABELS = [
+  'NO 😏',
+  'Wait... 😳',
+  'Are you sure? 👀',
+  'Think again 😂',
+  'Really?! 😭',
+];
+
+const MOBILE_TAP_MESSAGES = [
+  'Wait... seriously? 😳',
+  "You've thought about this, huh? 😭",
 ];
 
 /**
  * NoEscapeButton — The signature interactive evasive button.
  * 
  * Desktop:
- * - Proximity evasion: runs away when cursor gets within proximity radius.
+ * - Proximity evasion: runs away smoothly when cursor gets within 90px.
+ * - Progressively cheeky label on each distinct dodge: "NO 😏" → "Wait... 😳" → "Are you sure? 👀" → "Think again 😂" → "Really?! 😭".
  * - Physics: Spring easing with boundary reflection.
- * - Never leaves viewport or overlaps hero question/YES button.
+ * - Strictly prevents overlap with the YES button and never leaves the viewport.
  * - Cooldown prevents jitter and rapid layout shifts.
  * 
  * Mobile:
  * - Dedicated touch model (no proximity dodge).
- * - Gentle playful spring wobble & micro-hint.
- * - Always reachable, never frustrates or traps the user.
+ * - Gentle playful spring wobble & cheeky micro-hint on taps:
+ *   Tap 1: "Wait... seriously? 😳"
+ *   Tap 2: "You've thought about this, huh? 😭"
+ *   Tap 3: Opens respectful confirmation without trapping the user.
  * 
  * Keyboard & Accessibility:
- * - Freezes evasion on focus (Tab).
+ * - Freezes evasion on focus (Tab) and centers the button.
+ * - Label resets to "NO 😏" for clean accessibility.
  * - Normal activation via Enter / Space.
  * - Accessible name and full ARIA support.
  */
 export default function NoEscapeButton({
   onSelectNo,
+  onDodge,
   className = '',
   id = 'no-btn',
   disabled = false,
@@ -48,6 +61,7 @@ export default function NoEscapeButton({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isTouch, setIsTouch] = useState(false);
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
+  const [dodgeCount, setDodgeCount] = useState(0);
   const [mobileTapCount, setMobileTapCount] = useState(0);
   const [playfulHint, setPlayfulHint] = useState<string | null>(null);
   const [wobbleKey, setWobbleKey] = useState(0);
@@ -73,11 +87,11 @@ export default function NoEscapeButton({
   // Clamped so it stays safely within the card bounds without hitting edges or overlapping YES
   const BOUNDS = {
     minX: -15, // Prevents moving left into the YES button
-    maxX: 110, // Allows playful movement to the right
+    maxX: 115, // Allows playful movement to the right
     minY: -48,
     maxY: 48,
     proximityRadius: 90, // px distance from cursor to button center to trigger dodge
-    jumpDistance: 70,    // px distance to jump on each dodge
+    jumpDistance: 72,    // px distance to jump on each dodge
     cooldownMs: 220,     // ms throttle between evasions to eliminate jitter
   };
 
@@ -109,6 +123,10 @@ export default function NoEscapeButton({
 
       if (dist < BOUNDS.proximityRadius) {
         lastMoveTime.current = now;
+
+        // Advance cheeky micro-copy step
+        setDodgeCount((prev) => Math.min(prev + 1, DESKTOP_DODGE_LABELS.length - 1));
+        if (onDodge) onDodge();
 
         // Escape vector pointing away from cursor
         let nx = dist > 1 ? deltaX / dist : Math.random() > 0.5 ? 1 : 0.5;
@@ -147,7 +165,7 @@ export default function NoEscapeButton({
         setOffset({ x: targetX, y: targetY });
       }
     },
-    [isTouch, isKeyboardFocused, prefersReducedMotion, disabled, BOUNDS]
+    [isTouch, isKeyboardFocused, prefersReducedMotion, disabled, BOUNDS, onDodge]
   );
 
   // Global pointer listener on desktop
@@ -176,9 +194,9 @@ export default function NoEscapeButton({
       setMobileTapCount(nextCount);
       setWobbleKey((prev) => prev + 1);
 
-      if (nextCount < 3) {
+      if (nextCount <= 2) {
         // Show playful micro-hint
-        const phrase = PLAYFUL_MOBILE_PHRASES[(nextCount - 1) % PLAYFUL_MOBILE_PHRASES.length];
+        const phrase = MOBILE_TAP_MESSAGES[nextCount - 1] || 'Are you sure? 🥺';
         setPlayfulHint(phrase);
         setTimeout(() => setPlayfulHint(null), 1800);
       } else {
@@ -192,19 +210,27 @@ export default function NoEscapeButton({
     onSelectNo();
   };
 
+  // Resolve current button label
+  const currentLabel = isKeyboardFocused
+    ? 'NO 😏'
+    : DESKTOP_DODGE_LABELS[dodgeCount];
+
   return (
     <div className="relative inline-flex flex-col items-center justify-center">
       {/* Playful micro-hint for mobile taps */}
-      {playfulHint && (
-        <motion.div
-          initial={{ opacity: 0, y: 6, scale: 0.9 }}
-          animate={{ opacity: 1, y: -28, scale: 1 }}
-          exit={{ opacity: 0, y: -34, scale: 0.9 }}
-          className="absolute pointer-events-none z-30 whitespace-nowrap bg-dark/90 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md backdrop-blur-sm"
-        >
-          {playfulHint}
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {playfulHint && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.9 }}
+            animate={{ opacity: 1, y: -32, scale: 1 }}
+            exit={{ opacity: 0, y: -38, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 450, damping: 25 }}
+            className="absolute pointer-events-none z-30 whitespace-nowrap bg-dark/95 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm border border-white/20"
+          >
+            {playfulHint}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.div
         animate={
@@ -228,8 +254,8 @@ export default function NoEscapeButton({
           animate={
             wobbleKey > 0 && !prefersReducedMotion
               ? {
-                  rotate: [0, -7, 7, -4, 4, 0],
-                  scale: [1, 0.96, 1.02, 0.98, 1],
+                  rotate: [0, -8, 8, -5, 5, 0],
+                  scale: [1, 0.95, 1.03, 0.98, 1],
                 }
               : {}
           }
@@ -253,15 +279,16 @@ export default function NoEscapeButton({
               'bg-surface/90 text-muted-foreground hover:text-dark',
               'border border-border/90 shadow-sm hover:shadow',
               'font-sans text-sm sm:text-base font-medium',
-              'min-h-[44px] min-w-[100px]',
+              'min-h-[48px] min-w-[110px]',
               'transition-colors duration-150',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
               disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               className,
             ].join(' ')}
           >
-            <span>NO</span>
-            <span className="text-xs" aria-hidden="true">😏</span>
+            <span className="whitespace-nowrap transition-all duration-150">
+              {currentLabel}
+            </span>
           </button>
         </motion.div>
       </motion.div>

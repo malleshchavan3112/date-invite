@@ -56,10 +56,10 @@ export default function OptionalMessageStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                Anything you&apos;d like them to know?
+                Want to leave a little message?&nbsp;💌
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Totally optional. Dietary preferences, little ideas, or anything else.
+                Totally optional. Dietary preferences, inside jokes, or secret requests.
               </p>
             </div>
 

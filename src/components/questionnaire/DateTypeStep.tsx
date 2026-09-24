@@ -60,10 +60,10 @@ export default function DateTypeStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                What kind of date sounds good?
+                Okay, what kind of date are we talking?&nbsp;🍽️
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Pick the one that feels most like you.
+                Pick the one that sounds like the most fun.
               </p>
             </div>
 

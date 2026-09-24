@@ -59,10 +59,10 @@ export default function PreferredDayStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                When would you like to go?
+                When are you usually free?&nbsp;🗓️
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Pick your favorite day to hang out.
+                Pick whatever day works best for your schedule.
               </p>
             </div>
 

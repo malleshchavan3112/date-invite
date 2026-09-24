@@ -82,10 +82,10 @@ export default function SubmittingScreen() {
             tabIndex={-1}
             className="font-serif text-2xl sm:text-3xl text-dark leading-snug outline-none font-normal"
           >
-            Sending your answer…
+            Sending the important stuff…
           </h1>
           <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-xs leading-relaxed">
-            Just a moment — your response is on its way.
+            Hold tight — your response is on its way!
           </p>
         </div>
 

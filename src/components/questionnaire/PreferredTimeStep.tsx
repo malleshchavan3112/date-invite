@@ -58,10 +58,10 @@ export default function PreferredTimeStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                What time feels right?
+                Pick a time that won&apos;t require a miracle&nbsp;⏰
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Pick the hour that fits your flow.
+                Or at least one where you&apos;ll actually be awake.
               </p>
             </div>
 

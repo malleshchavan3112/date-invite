@@ -60,7 +60,7 @@ export default function DateVibeStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                What&apos;s the vibe?
+                Now the important part: what&apos;s the vibe?&nbsp;✨
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
                 Set the mood for our time together.

@@ -133,10 +133,10 @@ export default function ReviewAnswersStep({
             {/* Heading */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                Looks good?&nbsp;💌
+                Okay... let&apos;s see what we&apos;ve planned&nbsp;👀
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-                Here&apos;s what you&apos;re sending back.
+                Double-check everything before sending your answer.
               </p>
             </div>
 

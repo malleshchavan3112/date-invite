@@ -98,7 +98,7 @@ export default function CreateInvitationScreen() {
 
           <FadeIn delay={0.24}>
             <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-xs mx-auto text-balance">
-              Create a private invitation and send it to someone special.
+              Create a funny, interactive invitation in seconds.
             </p>
           </FadeIn>
         </div>

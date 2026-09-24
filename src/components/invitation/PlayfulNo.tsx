@@ -14,9 +14,18 @@ interface PlayfulNoProps {
 // ─── Content per attempt ────────────────────────────────────────────────────
 const MESSAGES = [
   null,
-  { heading: 'Hmm, are you sure? 🤔', body: 'The button seems a little slippery today…' },
-  { heading: 'Really though? 😅', body: "It's trying its best to change your mind…" },
-  { heading: 'Okay, one last thing.', body: 'We just want to make sure…' },
+  {
+    heading: 'Okay okay... 😭',
+    body: "Fair enough. Let's make sure that's actually what you mean.",
+  },
+  {
+    heading: 'Still dodging? 👀',
+    body: "We're not crying, you are... okay maybe a tiny bit.",
+  },
+  {
+    heading: 'Alright, one last check 🥺',
+    body: 'Fair enough. Is this genuinely your final answer?',
+  },
 ] as const;
 
 // Where the NO button drifts safely within card bounds
@@ -229,11 +238,11 @@ function ConfirmNoModal({ onYes, onNo }: ConfirmNoModalProps) {
               id="modal-heading"
               className="font-serif text-2xl text-dark mb-2 font-normal"
             >
-              Nice try.
+              Nice try 👀
             </h2>
 
             <p className="font-sans text-sm text-muted-foreground mb-6 leading-relaxed">
-              Is this your <em>final</em> answer?
+              Is this really your <em>final</em> answer? No hard feelings, promise!
             </p>
 
             <div className="flex flex-col gap-3">

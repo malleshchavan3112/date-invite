@@ -21,27 +21,26 @@ const CELEBRATION_PARTICLES = [
 /**
  * P03 — Main Date Question (Hero Screen)
  *
- * Features:
- * - Ambient decorative background with floating petals & glow orbs
- * - Refined romantic avatar container with gentle floating motion
- * - High-contrast typography with DM Serif Display headline
- * - YES primary CTA with subtle ambient pulse and celebration burst
- * - NO evasive button with desktop pointer proximity dodge + mobile touch model
- * - 100% accessible via keyboard and screen readers
+ * Funny & Playful Polish:
+ * - Cheeky eyebrow: "⚠️ IMPORTANT QUESTION"
+ * - Playful supporting copy: "No pressure... okay, maybe a tiny bit. 😌"
+ * - Avatar surprise reaction whenever the NO button dodges
+ * - Bold confident YES CTA: "Obviously YES 😌"
+ * - Evasive NO button with progressive cheeky micro-copy
+ * - Subtle bottom note: "Choose wisely 👀"
  */
 export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionProps) {
   const [celebrating, setCelebrating] = useState(false);
+  const [avatarReaction, setAvatarReaction] = useState(0);
   const hasActed = useRef(false);
   const prefersReducedMotion = useReducedMotion();
-
-  const creatorName = invitation?.creator_name || 'Someone special';
-  const supportingText = invitation?.intro_text || `${creatorName} asked with hope in their heart ✨`;
 
   const handleYes = useCallback(() => {
     if (hasActed.current) return;
     hasActed.current = true;
     setCelebrating(true);
-    setTimeout(onYes, prefersReducedMotion ? 120 : 1000);
+    // Snappy transition
+    setTimeout(onYes, prefersReducedMotion ? 100 : 750);
   }, [onYes, prefersReducedMotion]);
 
   const handleNo = useCallback(() => {
@@ -49,6 +48,10 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
     hasActed.current = true;
     onNo();
   }, [onNo]);
+
+  const handleNoDodge = useCallback(() => {
+    setAvatarReaction((prev) => prev + 1);
+  }, []);
 
   return (
     <div className="screen relative overflow-hidden min-h-dvh flex flex-col justify-center items-center px-4 py-8">
@@ -77,7 +80,7 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
           className="mb-4 inline-flex items-center gap-1.5 bg-primary-subtle text-primary border border-primary/20 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-          <span>Special Invitation</span>
+          <span>⚠️ Important Question</span>
         </motion.div>
 
         {/* ── Refined Avatar / Image Presentation ── */}
@@ -93,21 +96,28 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
             aria-hidden="true"
           />
 
-          {/* Avatar Container */}
+          {/* Avatar Container with idle breathing + cheeky dodge reaction */}
           <motion.div
+            key={avatarReaction}
             animate={
               prefersReducedMotion
                 ? {}
+                : avatarReaction > 0
+                ? {
+                    y: [0, -8, 0],
+                    rotate: [0, -6, 6, 0],
+                    scale: [1, 1.05, 1],
+                  }
                 : {
                     y: [0, -5, 0],
                     rotate: [0, 1, 0, -1, 0],
                   }
             }
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            transition={
+              avatarReaction > 0
+                ? { duration: 0.45, ease: 'easeOut' }
+                : { duration: 5, repeat: Infinity, ease: 'easeInOut' }
+            }
             className="w-full h-full relative rounded-[1.75rem] overflow-hidden border-2 border-white shadow-md bg-sand-50"
           >
             <Image
@@ -150,7 +160,7 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
           transition={{ delay: 0.28, duration: 0.3 }}
         >
           <p className="font-sans text-sm sm:text-base text-muted-foreground mb-7 text-balance max-w-xs mx-auto leading-relaxed">
-            {supportingText}
+            No pressure... okay, maybe a tiny bit. 😌
           </p>
         </motion.div>
 
@@ -159,7 +169,7 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.34, duration: 0.3 }}
-          className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1"
+          className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1 min-h-[64px]"
         >
           {/* YES Primary CTA with subtle pulse glow */}
           <div className="relative w-full sm:w-auto">
@@ -176,11 +186,11 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
               onClick={handleYes}
               disabled={celebrating}
               id="yes-btn"
-              aria-label="Yes, I would love to go on a date"
-              className="w-full sm:w-auto px-9 py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover font-semibold"
+              aria-label="Obviously yes, I would love to go on a date"
+              className="w-full sm:w-auto px-8 py-3.5 text-base sm:text-lg shadow-button hover:shadow-button-hover font-semibold whitespace-nowrap"
             >
-              <span>YES</span>
-              <span className="text-sm" aria-hidden="true">❤️</span>
+              <span>Obviously YES</span>
+              <span className="text-sm" aria-hidden="true">😌</span>
             </PrimaryButton>
           </div>
 
@@ -188,6 +198,7 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
           <div className="w-full sm:w-auto flex justify-center">
             <NoEscapeButton
               onSelectNo={handleNo}
+              onDodge={handleNoDodge}
               id="no-btn"
               disabled={celebrating}
               className="w-full sm:w-auto"
@@ -195,14 +206,14 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
           </div>
         </motion.div>
 
-        {/* Reassuring micro-footer */}
+        {/* Humorous micro-footer */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.4 }}
-          className="text-[11px] text-muted/60 tracking-wide uppercase font-sans mt-6"
+          className="text-xs text-muted/70 tracking-wide font-sans mt-6"
         >
-          Answer honestly • Made with care
+          Choose wisely 👀
         </motion.p>
       </motion.div>
     </div>
@@ -223,7 +234,7 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
         className="fixed inset-0 bg-primary/10 pointer-events-none z-30"
         initial={{ opacity: 0 }}
         animate={{ opacity: [0, 0.8, 0] }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       />
     );
   }
@@ -240,7 +251,7 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
         const tx = Math.cos((angle * Math.PI) / 180) * dist;
         const ty = Math.sin((angle * Math.PI) / 180) * dist - 80;
         const sz = 18 + Math.random() * 16;
-        const delay = Math.random() * 0.12;
+        const delay = Math.random() * 0.1;
 
         return (
           <motion.span
@@ -261,7 +272,7 @@ function CelebrationBurst({ prefersReducedMotion }: CelebrationBurstProps) {
               opacity: [1, 1, 0.8, 0],
             }}
             transition={{
-              duration: 1.05,
+              duration: 0.9,
               delay,
               ease: [0.2, 0, 0.4, 1],
             }}

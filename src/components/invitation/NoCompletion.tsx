@@ -43,13 +43,13 @@ export default function NoCompletion() {
 
         <FadeIn delay={0.28}>
           <p className="font-sans text-base text-muted-foreground mb-2">
-            Maybe next time.
+            No worries. Thanks for being honest. 🤝
           </p>
         </FadeIn>
 
         <FadeIn delay={0.38}>
           <p className="font-sans text-sm text-muted leading-relaxed">
-            Thank you for being honest. Take care&nbsp;🌿
+            Maybe another time. Take good care&nbsp;🌿
           </p>
         </FadeIn>
 

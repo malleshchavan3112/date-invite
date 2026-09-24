@@ -62,7 +62,7 @@ export default function RecipientNameStep({
             {/* Question & Supporting Copy */}
             <div className="mb-6 text-left">
               <h1 className="font-serif text-2xl sm:text-3xl text-dark mb-2 leading-snug font-normal text-balance">
-                First things first… what&apos;s your name?&nbsp;✨
+                First things first... who are we planning this for?&nbsp;✨
               </h1>
               <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
                 So I know who I&apos;m making this little plan for.

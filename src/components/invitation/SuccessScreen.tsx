@@ -171,13 +171,13 @@ export default function SuccessScreen({
           {/* Supporting Copy */}
           <FadeIn delay={0.18}>
             <p className="font-sans text-base font-semibold text-primary mb-2">
-              Your answer has been sent.
+              Well... that went better than expected.&nbsp;😌
             </p>
           </FadeIn>
 
           <FadeIn delay={0.26}>
             <p className="font-sans text-sm text-muted-foreground mb-6 leading-relaxed max-w-xs mx-auto text-balance">
-              Your response has been recorded. {invitation.creator_name} will get your response and can take it from here.
+              Your response has been sent to {invitation.creator_name}. They&apos;ll take it from here!
             </p>
           </FadeIn>
 

@@ -10,6 +10,15 @@ interface QuestionnaireProgressProps {
   isEditingFromReview?: boolean;
 }
 
+const STEP_HINTS: Record<number, string> = {
+  1: 'The fun begins ✨',
+  2: "We're getting somewhere 👀",
+  3: 'Finding the sweet spot 📅',
+  4: 'Timing is everything ⏰',
+  5: 'Setting the vibe 💫',
+  6: 'Almost there 💌',
+};
+
 /**
  * QuestionnaireProgress — Subtle, animated progress header for P06–P11.
  * Features a high-contrast back button, step indicator, and progress pills.
@@ -45,31 +54,38 @@ export default function QuestionnaireProgress({
 
       {/* Progress Dots & Counter */}
       <div
-        className="flex items-center gap-2"
+        className="flex flex-col items-end"
         role="region"
         aria-label={`Questionnaire progress: step ${currentStep} of ${totalSteps}`}
       >
-        <span className="text-xs uppercase tracking-wider font-semibold text-muted font-sans">
-          {currentStep} of {totalSteps}
-        </span>
-        <div className="flex items-center gap-1" aria-hidden="true">
-          {Array.from({ length: totalSteps }).map((_, i) => {
-            const isCompleted = i < currentStep - 1;
-            const isCurrent = i === currentStep - 1;
+        <div className="flex items-center gap-2">
+          <span className="text-xs uppercase tracking-wider font-semibold text-muted font-sans">
+            Step {currentStep} of {totalSteps}
+          </span>
+          <div className="flex items-center gap-1" aria-hidden="true">
+            {Array.from({ length: totalSteps }).map((_, i) => {
+              const isCompleted = i < currentStep - 1;
+              const isCurrent = i === currentStep - 1;
 
-            return (
-              <motion.span
-                key={i}
-                animate={{
-                  width: isCurrent ? 16 : 6,
-                  backgroundColor: isCurrent ? '#FF4F7B' : isCompleted ? '#FF7A9B' : '#F0D6DF',
-                }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="h-1.5 rounded-full inline-block"
-              />
-            );
-          })}
+              return (
+                <motion.span
+                  key={i}
+                  animate={{
+                    width: isCurrent ? 16 : 6,
+                    backgroundColor: isCurrent ? '#FF4F7B' : isCompleted ? '#FF7A9B' : '#F0D6DF',
+                  }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="h-1.5 rounded-full inline-block"
+                />
+              );
+            })}
+          </div>
         </div>
+        {STEP_HINTS[currentStep] && (
+          <span className="text-[11px] text-muted/70 font-sans mt-0.5" aria-hidden="true">
+            {STEP_HINTS[currentStep]}
+          </span>
+        )}
       </div>
     </div>
   );
