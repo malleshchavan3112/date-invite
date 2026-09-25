@@ -1,11 +1,12 @@
 'use server';
 
-import { createInvitation } from './invitation-repository';
+import { createInvitation, getInvitationByCreatorToken } from './invitation-repository';
 import { submitResponse } from './response-repository';
 import type {
   CreateInvitationInput,
   SubmitResponseInput,
   SubmitResponseResult,
+  StatusPageResult,
 } from '@/types';
 
 export interface CreateInvitationActionResult {
@@ -94,4 +95,20 @@ export async function submitNoResponseAction(
     };
   }
 }
+
+/**
+ * Server Action: Fetches fresh creator dashboard status for a private access token.
+ * Used for live polling while in Waiting State and for manual refresh.
+ * Queries Supabase freshly through getInvitationByCreatorToken().
+ */
+export async function checkCreatorStatusAction(
+  token: string
+): Promise<StatusPageResult> {
+  const trimmed = token?.trim();
+  if (!trimmed) {
+    return { status: 'not_found' };
+  }
+  return await getInvitationByCreatorToken(trimmed);
+}
+
 

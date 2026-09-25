@@ -1,5 +1,30 @@
 # Changelog
 
+## [Phase 9A Polish] — 2026-09-25
+
+### Added
+- **Live Creator Dashboard Auto-Refresh & Real-Time Polling**:
+  - Implemented `checkCreatorStatusAction(token)` Server Action in `src/lib/actions.ts` querying Supabase freshly via `getInvitationByCreatorToken()`.
+  - Added 6-second polling loop in `CreatorStatusDashboard.tsx` during State A (Waiting for Response) that automatically terminates once a response is detected.
+  - Dynamically updates local state (`currentResponse`) to immediately render State B (Response Received) without requiring browser refresh or navigation.
+  - Added visible manual "Refresh" button with loading spinner in the dashboard header and a "Check Now" button in `WaitingState.tsx`.
+  - Added "Live auto-refresh active" status pill and last-checked freshness tracking.
+- **Desktop Responsive Max-Width System**:
+  - Enhanced `DateInviteCard.tsx` with size variants:
+    - `questionnaire`: `w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto` (~680px–740px)
+    - `dashboard`: `w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[780px] mx-auto` (~780px)
+    - `narrow`: `w-full max-w-md sm:max-w-lg mx-auto`
+  - Replaced rigid 448px `max-w-md` constraints across all recipient questionnaire steps (`RecipientNameStep`, `DateTypeStep`, `PreferredDayStep`, `PreferredTimeStep`, `DateVibeStep`, `ActivityPreferenceStep`, `LocationPreferenceStep`, `FoodPreferenceStep`, `SpontaneityStep`, `OptionalMessageStep`, `ReviewAnswersStep`, `SubmittingScreen`, `SuccessScreen`).
+- **Balanced 2-Column Desktop Grid for Multi-Choice Screens**:
+  - Converted multi-choice cards from vertical stacks into balanced 2-column grids on desktop (`sm:grid-cols-2`), gracefully collapsing to single-column on mobile (`grid-cols-1`).
+  - Strengthened `ChoiceCard.tsx` selected state with refined border, glowing ring (`ring-1 ring-primary/25`), and warm pink gradient accent.
+  - Equalized card heights (`h-full min-h-[54px] sm:min-h-[58px]`) and optimized internal padding.
+
+### Changed
+- Refined `.content-card` and `.choice-card` utility classes in `src/app/globals.css` to remove rigid height and width constraints.
+
+---
+
 ## [Phase 7.5] — 2026-09-24
 
 ### Added

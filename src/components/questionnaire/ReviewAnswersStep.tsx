@@ -156,8 +156,8 @@ export default function ReviewAnswersStep({
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard size="questionnaire">
           {/* Header back button */}
           <div className="w-full flex items-center justify-between gap-4 mb-5">
             <button
@@ -196,11 +196,11 @@ export default function ReviewAnswersStep({
           </div>
 
           {/* Date Plan Cards Grid */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
             {planItems.map((item) => (
               <div
                 key={item.key}
-                className="bg-white/80 border border-primary/15 rounded-2xl p-3 shadow-2xs flex flex-col justify-between relative group hover:border-primary/30 transition-colors"
+                className="bg-white/85 border border-primary/15 rounded-2xl p-3 sm:p-3.5 shadow-2xs flex flex-col justify-between relative group hover:border-primary/30 transition-colors min-h-[70px]"
               >
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <span className="text-[10px] uppercase font-bold tracking-widest text-muted flex items-center gap-1">

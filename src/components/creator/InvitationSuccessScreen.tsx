@@ -143,7 +143,7 @@ export default function InvitationSuccessScreen() {
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto relative z-10">
         {/* Success Icon & Heading */}
         <div className="text-center mb-6">
           <FadeIn delay={0.08}>
@@ -165,7 +165,7 @@ export default function InvitationSuccessScreen() {
               </motion.span>
               <motion.span
                 animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+                transition={{ duration: 2.0, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
                 className="absolute -bottom-2 -left-3 text-xs select-none pointer-events-none"
               >
                 🎉
@@ -214,7 +214,7 @@ export default function InvitationSuccessScreen() {
         </div>
 
         {/* Link Card & Action Container */}
-        <DateInviteCard delay={0.32} className="space-y-6">
+        <DateInviteCard delay={0.32} size="narrow" className="space-y-6">
           {/* ── SECTION 1: PUBLIC INVITATION LINK ── */}
           <div>
             <div className="flex items-center justify-between mb-2">

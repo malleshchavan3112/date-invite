@@ -45,8 +45,8 @@ export default function LocationPreferenceStep({
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard size="questionnaire">
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={4}
@@ -81,6 +81,7 @@ export default function LocationPreferenceStep({
                 description={item.description}
                 selected={selected === item.id}
                 onSelect={() => setSelected(item.id)}
+                className={item.id === 'anywhere' ? 'sm:col-span-2' : ''}
               />
             ))}
           </div>

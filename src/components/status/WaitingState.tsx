@@ -11,12 +11,18 @@ interface WaitingStateProps {
   invitation: SafeInvitationStatus;
   invitationUrl: string;
   token?: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
+  lastCheckedAt?: Date;
 }
 
 export default function WaitingState({
   invitation,
   invitationUrl,
   token,
+  onRefresh,
+  isRefreshing = false,
+  lastCheckedAt,
 }: WaitingStateProps) {
   return (
     <div className="space-y-6">
@@ -57,10 +63,15 @@ export default function WaitingState({
         </div>
 
         {/* Status Pill */}
-        <div className="mb-3">
+        <div className="mb-3 flex items-center justify-center gap-2 flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true" />
             <span>Waiting for Response</span>
+          </span>
+
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+            <span>Live auto-refresh active</span>
           </span>
         </div>
 
@@ -70,7 +81,7 @@ export default function WaitingState({
         </h2>
 
         {/* Subtitle */}
-        <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-sm mx-auto leading-relaxed text-balance">
+        <p className="font-sans text-sm sm:text-base text-muted-foreground max-w-sm sm:max-w-md mx-auto leading-relaxed text-balance">
           {invitation.creator_name
             ? `Your invitation from ${invitation.creator_name} is active and ready.`
             : 'Your invitation is active and ready.'}{' '}
@@ -80,10 +91,38 @@ export default function WaitingState({
 
       {/* Status Checklist Card */}
       <div className="bg-white/80 backdrop-blur-sm border border-primary/15 rounded-2xl p-4 sm:p-5 shadow-2xs">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted mb-3 flex items-center gap-1.5">
-          <span aria-hidden="true">📋</span>
-          <span>Invitation Status</span>
-        </h3>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+            <span aria-hidden="true">📋</span>
+            <span>Invitation Status</span>
+          </h3>
+
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              id="waiting-state-refresh-btn"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover px-2.5 py-1 rounded-full border border-primary/20 bg-primary-subtle/50 hover:bg-primary-subtle transition-all disabled:opacity-50"
+              title="Query Supabase for response immediately"
+            >
+              <svg
+                className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span>{isRefreshing ? 'Checking…' : 'Check Now'}</span>
+            </button>
+          )}
+        </div>
 
         <div className="space-y-2.5">
           <div className="flex items-center gap-3 text-sm text-dark font-medium">
@@ -100,11 +139,16 @@ export default function WaitingState({
             <span>Link Ready to Share</span>
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-amber-800 font-semibold bg-amber-50/70 p-2 rounded-xl border border-amber-200/60">
-            <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 animate-pulse">
-              ⏳
+          <div className="flex items-center justify-between gap-3 text-sm text-amber-800 font-semibold bg-amber-50/70 p-2.5 rounded-xl border border-amber-200/60">
+            <div className="flex items-center gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 animate-pulse">
+                ⏳
+              </span>
+              <span>Waiting for Response</span>
+            </div>
+            <span className="text-[11px] font-normal text-amber-700 font-sans">
+              Auto-checking every 6s
             </span>
-            <span>Waiting for Response</span>
           </div>
         </div>
       </div>

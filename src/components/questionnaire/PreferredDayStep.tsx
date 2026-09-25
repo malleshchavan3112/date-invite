@@ -45,8 +45,8 @@ export default function PreferredDayStep({
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard size="questionnaire">
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={5}
@@ -66,9 +66,9 @@ export default function PreferredDayStep({
             </p>
           </div>
 
-          {/* Choice Cards List */}
+          {/* Choice Cards Grid */}
           <div
-            className="space-y-2.5 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-6"
             role="radiogroup"
             aria-label="Preferred day options"
           >
@@ -81,6 +81,7 @@ export default function PreferredDayStep({
                 description={item.description}
                 selected={selected === item.id}
                 onSelect={() => setSelected(item.id)}
+                className={item.id === 'any' ? 'sm:col-span-2' : ''}
               />
             ))}
           </div>

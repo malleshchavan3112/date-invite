@@ -1,18 +1,53 @@
 # Project Status
 
 ## Current Phase
-PHASE 7.5 COMPLETE — DateInvite Creative Visual Experience Upgrade • STOP CONDITION: Phase 7.5 Complete
+PHASE 9A COMPLETED & HARDENED — Responsive Desktop UI & Live Creator Dashboard Auto-Refresh • STOP CONDITION: Complete
 
 ---
 
 ## Core Product Model
 The product architecture has transitioned to a **two-sided invitation model**:
-1. **Invitation Creator**: Creates unique invitation via `/` or `/create` (C01), receives shareable link (C02), monitors status (C03), and receives structured response emails on YES.
+1. **Invitation Creator**: Creates unique invitation via `/` or `/create` (C01), receives shareable link (C02), monitors status via private link `/manage/[token]` (C03), and receives structured response emails on YES.
 2. **Invitation Recipient**: Opens `/invite/[slug]`, completes the interactive question flow (P01–P05), completes questionnaire on YES (P06–P12), and submits (P13–P14).
 
 ---
 
 ## Completed Milestones
+
+### Phase 9A Polish — Responsive Desktop UI Upgrade & Live Creator Dashboard Auto-Refresh ✅
+- [x] **Desktop Responsive Max-Width System (`DateInviteCard`)**:
+  - Replaced rigid 448px `max-w-md` mobile container with a controlled responsive system:
+    - `questionnaire`: `w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto` (~680px–740px on desktop)
+    - `dashboard`: `w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[780px] mx-auto` (~780px for wide response dossiers)
+    - `narrow`: `w-full max-w-md sm:max-w-lg mx-auto` (for landing and playful NO flows)
+  - Updated `globals.css` `.content-card` and `.choice-card` styles to eliminate excessive vertical card heights and rigid dimensions.
+- [x] **Questionnaire Screen Visual Hierarchy & Grid Redesign**:
+  - Transformed multi-choice screens into balanced 2-column grids on desktop (`sm:grid-cols-2`), gracefully collapsing to single-column on mobile (`grid-cols-1`):
+    - `RecipientNameStep`: Broadened input card with generous padding and focused button alignment.
+    - `DateTypeStep`: 2-column grid of 6 date options with aligned icons, labels, and micro-descriptions.
+    - `PreferredDayStep`: 2-column grid for day selections with full-width spanning for "Any Day".
+    - `PreferredTimeStep`: Balanced 2x2 grid for Morning, Afternoon, Evening, and Late Night.
+    - `DateVibeStep`: Responsive card with expressive vibe tags.
+    - `ActivityPreferenceStep`: 2-column grid across 6 activity archetypes.
+    - `LocationPreferenceStep`: 2-column grid with "Anywhere" spanning 2 columns.
+    - `FoodPreferenceStep`: 2-column grid across 7 dietary preferences.
+    - `SpontaneityStep`: Balanced 2x2 grid for plan styles.
+    - `OptionalMessageStep`: Generous textarea area fitting the wider desktop container.
+    - `ReviewAnswersStep`: 2-column dossier overview card preventing text wrapping or truncation.
+- [x] **Live Creator Dashboard Auto-Refresh & Real-Time Polling**:
+  - Resolved root cause: Creator opening `/manage/[token]` in State A ("Waiting") remained static if recipient submitted later.
+  - Implemented `checkCreatorStatusAction(token)` Server Action directly querying Supabase via `getInvitationByCreatorToken()`.
+  - Configured 6-second polling loop in `CreatorStatusDashboard` during State A that stops immediately upon response detection.
+  - Dynamically updates local state to transition to State B ("Response Received") without full page reload.
+  - Added visible manual "Refresh" button with spin animation in the header and "Check Now" button in `WaitingState`.
+  - Added "Live auto-refresh active" badge and last-checked freshness tracking.
+- [x] **Verification & Architectural Integrity**:
+  - `npx tsc --noEmit` & `npm run build` passing with 0 errors.
+  - Automated E2E verification (`scripts/test-live-dashboard-refresh.ts`): Waiting → Response Received transition confirmed for YES and confirmed NO, with persistent state across browser reopens.
+  - Privacy firewall preserved: `creator_email` and internal UUIDs strictly stripped from all client states.
+  - Browser subagent visual verification executed across 375px mobile, 768px tablet, and 1280px desktop.
+
+---
 
 ### Phase 7.5 — DateInvite Creative Visual Experience Upgrade ✅
 - [x] **Multi-Layered Living Atmospheric Background (`DecorativeBackground` / `AnimatedRomanticBackground`)**:

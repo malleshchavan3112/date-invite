@@ -23,8 +23,8 @@ export default function LandingScreen({ invitation, onOpen }: LandingScreenProps
       <DecorativeBackground />
 
       {/* ── Main card ── */}
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard glow>
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto relative z-10">
+        <DateInviteCard glow size="narrow">
           {/* Floating 3D-styled sealed envelope centerpiece */}
           <FadeIn delay={0.06}>
             <div className="relative inline-flex items-center justify-center mb-6">

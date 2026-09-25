@@ -113,8 +113,8 @@ export default function SuccessScreen({
         </div>
       )}
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard glow>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard glow size="questionnaire">
           {/* Celebratory Icon & Badge */}
           <div className="relative inline-flex items-center justify-center mb-5">
             {/* Soft pink glow backdrop */}

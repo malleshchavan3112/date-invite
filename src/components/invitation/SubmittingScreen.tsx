@@ -31,8 +31,8 @@ export default function SubmittingScreen() {
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard glow>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard glow size="questionnaire">
           <div className="relative flex flex-col items-center gap-6 text-center py-4">
             {/* Glow rings and soaring envelope with particle trail */}
             <div className="relative flex items-center justify-center my-2">

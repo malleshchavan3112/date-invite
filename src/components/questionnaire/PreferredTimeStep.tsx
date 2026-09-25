@@ -44,8 +44,8 @@ export default function PreferredTimeStep({
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard size="questionnaire">
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={6}
@@ -65,9 +65,9 @@ export default function PreferredTimeStep({
             </p>
           </div>
 
-          {/* Choice Cards List */}
+          {/* Choice Cards Grid */}
           <div
-            className="space-y-2.5 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-6"
             role="radiogroup"
             aria-label="Preferred time options"
           >

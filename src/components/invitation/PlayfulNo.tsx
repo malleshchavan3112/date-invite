@@ -92,8 +92,8 @@ export default function PlayfulNo({ onActuallyYes, onConfirmNo }: PlayfulNoProps
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto relative z-10">
+        <DateInviteCard size="narrow">
           {/* Animated expressive character visual */}
           <div className="relative inline-flex items-center justify-center mb-4">
             <div

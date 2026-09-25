@@ -86,7 +86,7 @@ export default function CreateInvitationScreen() {
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto relative z-10">
         {/* Floating sealed invitation centerpiece visual */}
         <div className="relative mx-auto mb-3 w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
           <motion.div

@@ -2,6 +2,14 @@
 
 import { motion } from 'framer-motion';
 
+export type CardSizeVariant =
+  | 'default'
+  | 'questionnaire'
+  | 'dashboard'
+  | 'compact'
+  | 'narrow'
+  | 'wide';
+
 interface DateInviteCardProps {
   children: React.ReactNode;
   className?: string;
@@ -9,17 +17,28 @@ interface DateInviteCardProps {
   id?: string;
   role?: string;
   glow?: boolean;
+  size?: CardSizeVariant;
   'aria-label'?: string;
 }
+
+const SIZE_CLASSES: Record<CardSizeVariant, string> = {
+  default: 'w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative',
+  questionnaire: 'w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative',
+  dashboard: 'w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[780px] mx-auto relative',
+  compact: 'w-full max-w-sm sm:max-w-md mx-auto relative',
+  narrow: 'w-full max-w-md sm:max-w-lg mx-auto relative',
+  wide: 'w-full max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto relative',
+};
 
 /**
  * DateInviteCard — Premium paper/glass hybrid card surface for DateInvite.
  * 
  * Features:
+ * - Controlled responsive max-width system (680px–760px on desktop for questionnaire)
  * - Translucent warm cream surface with backdrop blur
  * - Layered ambient drop shadows with subtle romantic rose tint
  * - Soft inner border highlight (ring-1 ring-white/70)
- * - Large architectural rounded corners (rounded-[2rem] sm:rounded-[2.5rem])
+ * - Large architectural rounded corners (rounded-[2rem] sm:rounded-[2.25rem] lg:rounded-[2.5rem])
  * - Subtle hover lift and depth transition
  * - Optional ambient glow halo aura
  */
@@ -30,8 +49,13 @@ export default function DateInviteCard({
   id,
   role,
   glow = false,
+  size = 'default',
   'aria-label': ariaLabel,
 }: DateInviteCardProps) {
+  // If className already specifies a max-w override, avoid duplicating default width
+  const hasCustomMaxWidth = className.includes('max-w-') || className.includes('!max-w-');
+  const widthClass = hasCustomMaxWidth ? 'w-full mx-auto relative' : SIZE_CLASSES[size];
+
   return (
     <motion.div
       id={id}
@@ -46,11 +70,11 @@ export default function DateInviteCard({
         ease: [0.25, 0.1, 0.25, 1],
       }}
       className={[
-        'w-full max-w-md mx-auto relative',
+        widthClass,
         'bg-gradient-to-b from-white/95 via-white/90 to-[#FFFDF9]/90',
         'backdrop-blur-xl',
-        'rounded-[2rem] sm:rounded-[2.5rem]',
-        'p-6 sm:p-9',
+        'rounded-[2rem] sm:rounded-[2.25rem] lg:rounded-[2.5rem]',
+        'p-5 sm:p-7 lg:p-9',
         'border border-[#FF4F7B]/15',
         'ring-1 ring-white/70',
         glow

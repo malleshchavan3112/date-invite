@@ -47,8 +47,8 @@ export default function FoodPreferenceStep({
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-[736px] mx-auto relative z-10">
+        <DateInviteCard size="questionnaire">
           {/* Header progress & back */}
           <QuestionnaireProgress
             currentStep={7}
@@ -65,7 +65,7 @@ export default function FoodPreferenceStep({
               we should know?&nbsp;🍽️
             </h1>
             <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-              So we can pick somewhere you'll actually enjoy.
+              So we can pick somewhere you&apos;ll actually enjoy.
             </p>
           </div>
 
@@ -84,6 +84,7 @@ export default function FoodPreferenceStep({
                 description={item.description}
                 selected={selected === item.id}
                 onSelect={() => setSelected(item.id)}
+                className={item.id === 'no_food' ? 'sm:col-span-2' : ''}
               />
             ))}
           </div>

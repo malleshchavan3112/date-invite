@@ -75,8 +75,8 @@ export default function DateQuestion({ invitation, onYes, onNo }: DateQuestionPr
       </AnimatePresence>
 
       {/* ── Hero Invitation Card ── */}
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard glow>
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto relative z-10">
+        <DateInviteCard glow size="narrow">
           {/* Eyebrow Pill */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}

@@ -16,8 +16,8 @@ export default function NoCompletion() {
       {/* ── Ambient Decorative Background ── */}
       <DecorativeBackground />
 
-      <div className="w-full max-w-sm sm:max-w-md mx-auto relative z-10">
-        <DateInviteCard>
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto relative z-10">
+        <DateInviteCard size="narrow">
           {/* Gently swaying cherry blossom / sprig motif */}
           <FadeIn delay={0.08}>
             <div className="relative inline-flex items-center justify-center mb-5">
