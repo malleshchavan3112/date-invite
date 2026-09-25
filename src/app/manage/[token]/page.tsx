@@ -4,6 +4,13 @@ import CreatorStatusDashboard from '@/components/status/CreatorStatusDashboard';
 import CreatorDashboardNotFound from '@/components/status/CreatorDashboardNotFound';
 import StatusErrorState from '@/components/status/StatusErrorState';
 
+/**
+ * Force dynamic rendering on every request.
+ * The creator dashboard must always query fresh data from Supabase —
+ * it must never serve a cached render from before the recipient submitted.
+ */
+export const dynamic = 'force-dynamic';
+
 interface ManagePageProps {
   params: { token: string };
 }
